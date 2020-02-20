@@ -2,10 +2,11 @@ package io.moia.scalaHttpClient
 
 import java.time.Clock
 
-import AwsRequestSigner.AwsRequestSignerConfig
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.{ModeledCustomHeader, ModeledCustomHeaderCompanion}
+import akka.stream.ActorMaterializer
+import io.moia.scalaHttpClient.AwsRequestSigner.AwsRequestSignerConfig
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.{Inside, Inspectors}
@@ -18,6 +19,7 @@ import scala.util.Try
 class HttpClientTest extends AnyWordSpecLike with Matchers with FutureValues with Inside {
 
   private implicit val system: ActorSystem                = ActorSystem("test")
+  private implicit val mat: ActorMaterializer             = ActorMaterializer()
   private implicit val executionContext: ExecutionContext = system.dispatcher
   private val httpClientConfig: HttpClientConfig          = HttpClientConfig("http", isSecureConnection = false, "127.0.0.1", 8888)
   private val clock: Clock                                = Clock.systemUTC()
@@ -49,7 +51,8 @@ class HttpClientTest extends AnyWordSpecLike with Matchers with FutureValues wit
       }
 
       // when
-      val _ = testHttpClient.request(HttpMethods.POST, HttpEntity.Empty, "/test", immutable.Seq.empty, Deadline.now + 10.seconds).futureValue
+      val _ =
+        testHttpClient.request(HttpMethods.POST, HttpEntity.Empty, "/test", immutable.Seq.empty, Deadline.now + 10.seconds).futureValue
 
       // then
       (capturedRequest.future.futureValue.headers
@@ -82,7 +85,9 @@ class HttpClientTest extends AnyWordSpecLike with Matchers with FutureValues wit
 
       // when
       val _ =
-        testHttpClient.request(HttpMethods.POST, HttpEntity.Empty, "/test", immutable.Seq(customerHeader), Deadline.now + 10.seconds).futureValue
+        testHttpClient
+          .request(HttpMethods.POST, HttpEntity.Empty, "/test", immutable.Seq(customerHeader), Deadline.now + 10.seconds)
+          .futureValue
 
       // then
       capturedRequest.future.futureValue.getHeader(CustomHeader.name).get.value should ===("foobar")

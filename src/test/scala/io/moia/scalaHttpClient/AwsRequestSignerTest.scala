@@ -1,9 +1,10 @@
 package io.moia.scalaHttpClient
 
-import AwsRequestSigner.AwsRequestSignerConfig
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.HttpHeader.ParsingResult.Ok
 import akka.http.scaladsl.model.{HttpHeader, HttpRequest, Uri}
+import akka.stream.ActorMaterializer
+import io.moia.scalaHttpClient.AwsRequestSigner.AwsRequestSignerConfig
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 
@@ -11,6 +12,7 @@ import scala.concurrent.duration.{FiniteDuration, _}
 
 class AwsRequestSignerTest extends AnyWordSpecLike with Matchers with FutureValues {
   private implicit val system: ActorSystem              = ActorSystem("test")
+  private implicit val mat: ActorMaterializer           = ActorMaterializer()
   protected implicit val patienceConfig: FiniteDuration = 2.seconds
 
   classOf[AwsRequestSigner].getSimpleName should {

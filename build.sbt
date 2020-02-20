@@ -1,8 +1,9 @@
+
 lazy val root = (project in file("."))
   .settings(
     name := "scala-http-client",
     organization := "io.moia",
-    version := "1.0.0",
+    version := "1.0.0-akka2.5",
     licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0")),
     scmInfo := Some(ScmInfo(url("https://github.com/moia-dev/scala-http-client"), "scm:git@github.com:moia-dev/scala-http-client.git")),
     homepage := Some(url("https://github.com/moia-dev/scala-http-client")),
@@ -18,7 +19,7 @@ lazy val root = (project in file("."))
     libraryDependencies ++= akkaDependencies ++ awsDependencies ++ testDependencies ++ loggingDependencies ++ otherDependencies
   )
 
-val akkaVersion     = "2.6.3"
+val akkaVersion     = "2.5.29"
 val akkaHttpVersion = "10.1.11"
 
 lazy val akkaDependencies = Seq(

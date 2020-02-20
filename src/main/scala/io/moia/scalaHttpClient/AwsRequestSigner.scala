@@ -8,7 +8,7 @@ import com.typesafe.scalalogging.StrictLogging
 import scala.concurrent.{blocking, Future}
 
 class AwsRequestSigner private (credentialsProvider: AWSCredentialsProvider, region: String)(implicit mat: Materializer)
-  extends StrictLogging {
+    extends StrictLogging {
   private val awsSigner = {
     val result = new AWS4Signer()
 

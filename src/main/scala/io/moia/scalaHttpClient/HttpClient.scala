@@ -6,6 +6,7 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.{`Retry-After`, RetryAfterDateTime, RetryAfterDuration}
+import akka.stream.ActorMaterializer
 import com.typesafe.scalalogging.StrictLogging
 
 import scala.collection.immutable
@@ -94,8 +95,10 @@ abstract class HttpLayer(
     case other                                                                   => Future.successful(HttpClientError(other))
   }
 
-  private def strictify(response: HttpResponse)(implicit ec: ExecutionContext): Future[HttpResponse] =
+  private def strictify(response: HttpResponse)(implicit ec: ExecutionContext): Future[HttpResponse] = {
+    implicit val materializer: ActorMaterializer = ActorMaterializer()
     response.toStrict(retryConfig.strictifyResponseTimeout)
+  }
 
   private[this] def shouldBeRetried(statusCode: StatusCode): Boolean =
     Seq(StatusCodes.RequestTimeout, StatusCodes.TooManyRequests, StatusCodes.ServiceUnavailable, StatusCodes.InternalServerError)
