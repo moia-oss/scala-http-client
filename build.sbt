@@ -17,7 +17,7 @@ lazy val root = (project in file("."))
       }
     },
     libraryDependencies ++= akkaDependencies ++ awsDependencies ++ testDependencies ++ loggingDependencies ++ otherDependencies
-  )
+  ).settings(sonatypeSettings: _*)
 
 val akkaVersion     = "2.5.29"
 val akkaHttpVersion = "10.1.11"
@@ -80,3 +80,14 @@ lazy val scalacOptions_2_13 = Seq(
   "-Ywarn-dead-code",
   "-Ymacro-annotations"
 )
+
+lazy val sonatypeSettings = {
+  import xerial.sbt.Sonatype._
+  Seq(
+    publishTo := sonatypePublishTo.value,
+    sonatypeProfileName := organization.value,
+    publishMavenStyle := true,
+    sonatypeProjectHosting := Some(GitHubHosting("moia-dev", "scala-http-client", "oss-support@moia.io")),
+    credentials += Credentials(Path.userHome / ".sbt" / "sonatype_credential")
+  )
+}
