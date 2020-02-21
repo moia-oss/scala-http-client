@@ -1,39 +1,17 @@
 package io.moia.scalaHttpClient
 
-import java.time.Clock
-
-import akka.actor.ActorSystem
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.{ModeledCustomHeader, ModeledCustomHeaderCompanion}
-import akka.stream.ActorMaterializer
+import com.typesafe.scalalogging.StrictLogging
 import io.moia.scalaHttpClient.AwsRequestSigner.AwsRequestSignerConfig
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.{Inside, Inspectors}
 
 import scala.collection.immutable
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.concurrent.{Future, Promise}
 import scala.util.Try
 
-class HttpClientTest extends AnyWordSpecLike with Matchers with FutureValues with Inside {
-
-  private implicit val system: ActorSystem                = ActorSystem("test")
-  private implicit val mat: ActorMaterializer             = ActorMaterializer()
-  private implicit val executionContext: ExecutionContext = system.dispatcher
-  private val httpClientConfig: HttpClientConfig          = HttpClientConfig("http", isSecureConnection = false, "127.0.0.1", 8888)
-  private val clock: Clock                                = Clock.systemUTC()
-  private val httpMetrics: HttpMetrics                    = (_: HttpMethod, _: Uri.Path, _: HttpResponse) => ()
-  private val retryConfig: RetryConfig =
-    RetryConfig(
-      retriesTooManyRequests = 2,
-      retriesServiceUnavailable = 0,
-      retriesRequestTimeout = 0,
-      retriesServerError = 0,
-      retriesException = 3,
-      initialBackoff = 10.millis,
-      strictifyResponseTimeout = 1.second
-    )
+class HttpClientTest extends TestSetup with Inside with StrictLogging {
 
   classOf[HttpClient].getSimpleName should {
     "sign requests" in {

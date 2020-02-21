@@ -7,7 +7,8 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.{`Retry-After`, RetryAfterDateTime, RetryAfterDuration}
 import akka.stream.ActorMaterializer
-import com.typesafe.scalalogging.StrictLogging
+import com.typesafe.scalalogging.{Logger, LoggerTakingImplicit}
+import org.slf4j.LoggerFactory
 
 import scala.collection.immutable
 import scala.concurrent.duration._
@@ -18,25 +19,50 @@ import scala.util.{Failure, Success, Try}
 class HttpClient(
     config: HttpClientConfig,
     gatewayType: String,
-    httpMetrics: HttpMetrics,
+    httpMetrics: HttpMetrics[String],
     retryConfig: RetryConfig,
     clock: Clock,
     awsRequestSigner: Option[AwsRequestSigner]
-)(implicit system: ActorSystem)
+)(
+    implicit system: ActorSystem
+) extends LoggingHttpClient[String](config, gatewayType, httpMetrics, retryConfig, clock, awsRequestSigner)(
+      system,
+      Logger.takingImplicit(LoggerFactory.getLogger(getClass.getName))((msg: String, _: String) => msg)
+    ) {
+  override def request(
+      method: HttpMethod,
+      entity: MessageEntity,
+      path: String,
+      headers: immutable.Seq[HttpHeader],
+      deadline: Deadline,
+      queryString: Option[String]
+  )(implicit executionContext: ExecutionContext, ctx: String = ""): Future[HttpClientResponse] =
+    super.request(method, entity, path, headers, deadline, queryString)
+}
+
+class LoggingHttpClient[LoggingContext](
+    config: HttpClientConfig,
+    gatewayType: String,
+    httpMetrics: HttpMetrics[LoggingContext],
+    retryConfig: RetryConfig,
+    clock: Clock,
+    awsRequestSigner: Option[AwsRequestSigner]
+)(implicit system: ActorSystem, logger: LoggerTakingImplicit[LoggingContext])
     extends HttpLayer(config, gatewayType, httpMetrics, retryConfig, clock, awsRequestSigner) {
   override protected def sendRequest: HttpRequest => Future[HttpResponse] = Http().singleRequest(_)
 }
 
-abstract class HttpLayer(
+abstract class HttpLayer[LoggingContext](
     config: HttpClientConfig,
     gatewayType: String,
-    httpMetrics: HttpMetrics,
+    httpMetrics: HttpMetrics[LoggingContext],
     retryConfig: RetryConfig,
     clock: Clock,
     awsRequestSigner: Option[AwsRequestSigner] = None
 )(
-    implicit system: ActorSystem
-) extends StrictLogging {
+    implicit system: ActorSystem,
+    logger: LoggerTakingImplicit[LoggingContext]
+) {
 
   protected def sendRequest: HttpRequest => Future[HttpResponse]
 
@@ -48,7 +74,8 @@ abstract class HttpLayer(
       deadline: Deadline,
       queryString: Option[String] = None
   )(
-      implicit executionContext: ExecutionContext
+      implicit executionContext: ExecutionContext,
+      ctx: LoggingContext
   ): Future[HttpClientResponse] =
     if (deadline.isOverdue()) {
       Future.successful(DeadlineExpired())
@@ -73,7 +100,8 @@ abstract class HttpLayer(
   }
 
   private[this] def executeRequest(request: HttpRequest, tryNumber: Int, deadline: Deadline)(
-      implicit ec: ExecutionContext
+      implicit ec: ExecutionContext,
+      ctx: LoggingContext
   ): Future[HttpClientResponse] =
     Future
       .successful(request)
@@ -87,7 +115,7 @@ abstract class HttpLayer(
 
   private[this] def handleResponse(tryNumber: Int, deadline: Deadline, httpRequest: HttpRequest)(
       response: HttpResponse
-  )(implicit ec: ExecutionContext): Future[HttpClientResponse] = response match {
+  )(implicit ec: ExecutionContext, ctx: LoggingContext): Future[HttpClientResponse] = response match {
     case response @ HttpResponse(StatusCodes.Success(_), _, _, _)                => Future.successful(HttpClientSuccess(response))
     case response @ HttpResponse(StatusCodes.BadRequest, _, HttpEntity.Empty, _) => Future.successful(HttpClientError(response))
     case response @ HttpResponse(StatusCodes.BadRequest, _, _, _)                => Future.successful(DomainError(response))
@@ -113,7 +141,8 @@ abstract class HttpLayer(
   }
 
   private[this] def retryWithConfig(tryNum: Int, request: HttpRequest, response: HttpResponse, deadline: Deadline)(
-      implicit ec: ExecutionContext
+      implicit ec: ExecutionContext,
+      ctx: LoggingContext
   ): Future[HttpClientResponse] =
     if (deadline.isOverdue()) {
       logger.info(s"[$gatewayType] Try #$tryNum: Deadline has expired.")
@@ -145,7 +174,8 @@ abstract class HttpLayer(
   }
 
   private[this] def handleErrors(tryNum: Int, deadline: Deadline, request: HttpRequest)(
-      implicit ec: ExecutionContext
+      implicit ec: ExecutionContext,
+      ctx: LoggingContext
   ): PartialFunction[Throwable, Future[HttpClientResponse]] = {
     case NonFatal(e) if tryNum <= retryConfig.retriesException =>
       val delay: FiniteDuration = calculateDelay(None, tryNum)
@@ -156,16 +186,16 @@ abstract class HttpLayer(
       Future.successful(DeadlineExpired(None))
   }
 
-  private[this] def logRequest[T]: PartialFunction[Try[HttpRequest], Unit] = {
+  private[this] def logRequest[T](implicit ctx: LoggingContext): PartialFunction[Try[HttpRequest], Unit] = {
     case Success(request) => logger.debug(s"[$gatewayType] Sending request to ${request.method.value} ${request.uri}.")
   }
 
-  private[this] def logRetryAfter: PartialFunction[Try[HttpResponse], Unit] = {
+  private[this] def logRetryAfter(implicit ctx: LoggingContext): PartialFunction[Try[HttpResponse], Unit] = {
     case Success(response) if response.header[`Retry-After`].isDefined =>
       logger.info(s"[$gatewayType] Received retry-after header with value ${response.header[`Retry-After`]}")
   }
 
-  private[this] def logResponse(request: HttpRequest): PartialFunction[Try[HttpResponse], Unit] = {
+  private[this] def logResponse(request: HttpRequest)(implicit ctx: LoggingContext): PartialFunction[Try[HttpResponse], Unit] = {
     case Success(response) =>
       httpMetrics.meterResponse(request.method, request.uri.path, response)
       logger.debug(s"[$gatewayType] Received response ${response.status} from ${request.method.value} ${request.uri}.")
