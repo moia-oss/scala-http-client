@@ -18,7 +18,7 @@ import scala.util.{Failure, Success, Try}
 
 class HttpClient(
     config: HttpClientConfig,
-    gatewayType: String,
+    name: String,
     httpMetrics: HttpMetrics[String],
     retryConfig: RetryConfig,
     clock: Clock,
@@ -27,7 +27,7 @@ class HttpClient(
     implicit system: ActorSystem
 ) extends LoggingHttpClient[String](
       config,
-      gatewayType,
+      name,
       httpMetrics,
       retryConfig,
       clock,
@@ -47,20 +47,20 @@ class HttpClient(
 
 class LoggingHttpClient[LoggingContext](
     config: HttpClientConfig,
-    gatewayType: String,
+    name: String,
     httpMetrics: HttpMetrics[LoggingContext],
     retryConfig: RetryConfig,
     clock: Clock,
     logger: LoggerTakingImplicit[LoggingContext],
     awsRequestSigner: Option[AwsRequestSigner]
 )(implicit system: ActorSystem)
-    extends HttpLayer(config, gatewayType, httpMetrics, retryConfig, clock, logger, awsRequestSigner) {
+    extends HttpLayer(config, name, httpMetrics, retryConfig, clock, logger, awsRequestSigner) {
   override protected def sendRequest: HttpRequest => Future[HttpResponse] = Http().singleRequest(_)
 }
 
 abstract class HttpLayer[LoggingContext](
     config: HttpClientConfig,
-    gatewayType: String,
+    val name: String,
     httpMetrics: HttpMetrics[LoggingContext],
     retryConfig: RetryConfig,
     clock: Clock,
@@ -151,20 +151,20 @@ abstract class HttpLayer[LoggingContext](
       ctx: LoggingContext
   ): Future[HttpClientResponse] =
     if (deadline.isOverdue()) {
-      logger.info(s"[$gatewayType] Try #$tryNum: Deadline has expired.")
+      logger.info(s"[$name] Try #$tryNum: Deadline has expired.")
       Future.successful(DeadlineExpired(Some(response)))
     } else if (tryNum <= retryCount(response.status)) {
       val delay: FiniteDuration = calculateDelay(response.header[`Retry-After`], tryNum)
 
       if ((deadline + delay).isOverdue()) {
-        logger.info(s"[$gatewayType] Try #$tryNum: Retry in ${delay.toMillis}ms would exceed Deadline. Giving up.")
+        logger.info(s"[$name] Try #$tryNum: Retry in ${delay.toMillis}ms would exceed Deadline. Giving up.")
         Future.successful(DeadlineExpired(Some(response)))
       } else {
-        logger.info(s"[$gatewayType] Try #$tryNum: Retrying in ${delay.toMillis}ms.")
+        logger.info(s"[$name] Try #$tryNum: Retrying in ${delay.toMillis}ms.")
         akka.pattern.after(delay, system.scheduler)(executeRequest(request, tryNum + 1, deadline))
       }
     } else {
-      logger.info(s"[$gatewayType] Try #$tryNum: No retries left. Giving up.")
+      logger.info(s"[$name] Try #$tryNum: No retries left. Giving up.")
       Future.successful(HttpClientError(response))
     }
 
@@ -185,28 +185,28 @@ abstract class HttpLayer[LoggingContext](
   ): PartialFunction[Throwable, Future[HttpClientResponse]] = {
     case NonFatal(e) if tryNum <= retryConfig.retriesException =>
       val delay: FiniteDuration = calculateDelay(None, tryNum)
-      logger.info(s"[$gatewayType] Exception in request: ${e.getMessage}, retrying in ${delay.toMillis}ms.", e)
+      logger.info(s"[$name] Exception in request: ${e.getMessage}, retrying in ${delay.toMillis}ms.", e)
       akka.pattern.after(delay, system.scheduler)(executeRequest(request, tryNum + 1, deadline))
     case NonFatal(e) =>
-      logger.warn(s"[$gatewayType] Exception in request: ${e.getMessage}, retries exhausted, giving up.", e)
+      logger.warn(s"[$name] Exception in request: ${e.getMessage}, retries exhausted, giving up.", e)
       Future.successful(DeadlineExpired(None))
   }
 
   private[this] def logRequest[T](implicit ctx: LoggingContext): PartialFunction[Try[HttpRequest], Unit] = {
-    case Success(request) => logger.debug(s"[$gatewayType] Sending request to ${request.method.value} ${request.uri}.")
+    case Success(request) => logger.debug(s"[$name] Sending request to ${request.method.value} ${request.uri}.")
   }
 
   private[this] def logRetryAfter(implicit ctx: LoggingContext): PartialFunction[Try[HttpResponse], Unit] = {
     case Success(response) if response.header[`Retry-After`].isDefined =>
-      logger.info(s"[$gatewayType] Received retry-after header with value ${response.header[`Retry-After`]}")
+      logger.info(s"[$name] Received retry-after header with value ${response.header[`Retry-After`]}")
   }
 
   private[this] def logResponse(request: HttpRequest)(implicit ctx: LoggingContext): PartialFunction[Try[HttpResponse], Unit] = {
     case Success(response) =>
       httpMetrics.meterResponse(request.method, request.uri.path, response)
-      logger.debug(s"[$gatewayType] Received response ${response.status} from ${request.method.value} ${request.uri}.")
+      logger.debug(s"[$name] Received response ${response.status} from ${request.method.value} ${request.uri}.")
     case Failure(e) =>
-      logger.info(s"[$gatewayType] Exception in Gateway for ${request.method.value} ${request.uri}: ${e.getMessage}", e)
+      logger.info(s"[$name] Exception in Gateway for ${request.method.value} ${request.uri}: ${e.getMessage}", e)
   }
 }
 
