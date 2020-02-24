@@ -18,6 +18,9 @@ lazy val root = (project in file("."))
     libraryDependencies ++= akkaDependencies ++ awsDependencies ++ testDependencies ++ loggingDependencies ++ otherDependencies
   )
   .settings(sonatypeSettings: _*)
+  .settings(
+    scalafmtOnCompile := true
+  )
 
 val akkaVersion     = "2.5.29"
 val akkaHttpVersion = "10.1.11"
