@@ -33,7 +33,7 @@ class LoggingHttpClientTest extends TestSetup {
   }
 
   private val theLogger: LoggerTakingImplicit[LoggingContext] = Logger.takingImplicit(LoggerFactory.getLogger(getClass.getName))
-  private implicit val ctx: LoggingContext                             = LoggingContext("Logging Context")
+  private implicit val ctx: LoggingContext                    = LoggingContext("Logging Context")
 
   classOf[LoggingHttpClient[LoggingContext]].getSimpleName should {
     "take a customer logger" in {
