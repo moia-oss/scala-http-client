@@ -32,7 +32,7 @@ class LoggingHttpClientTest extends TestSetup {
       } else MDC.remove("context")
   }
 
-  private implicit val theLogger: LoggerTakingImplicit[LoggingContext] = Logger.takingImplicit(LoggerFactory.getLogger(getClass.getName))
+  private val theLogger: LoggerTakingImplicit[LoggingContext] = Logger.takingImplicit(LoggerFactory.getLogger(getClass.getName))
   private implicit val ctx: LoggingContext                             = LoggingContext("Logging Context")
 
   classOf[LoggingHttpClient[LoggingContext]].getSimpleName should {
