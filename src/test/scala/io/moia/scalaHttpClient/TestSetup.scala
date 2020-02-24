@@ -17,8 +17,8 @@ trait TestSetup extends AnyWordSpecLike with Matchers with FutureValues {
   implicit val executionContext: ExecutionContext = system.dispatcher
 
   val clock: Clock = Clock.systemUTC()
-  val httpMetrics: HttpMetrics[String] = new HttpMetrics[String] {
-    override def meterResponse(method: HttpMethod, path: Uri.Path, response: HttpResponse)(implicit ctx: String): Unit = ()
+  val httpMetrics: HttpMetrics[NoLoggingContext] = new HttpMetrics[NoLoggingContext] {
+    override def meterResponse(method: HttpMethod, path: Uri.Path, response: HttpResponse)(implicit ctx: NoLoggingContext): Unit = ()
   }
 
   val httpClientConfig: HttpClientConfig = HttpClientConfig("http", isSecureConnection = false, "127.0.0.1", 8888)

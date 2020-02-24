@@ -19,19 +19,19 @@ import scala.util.{Failure, Success, Try}
 class HttpClient(
     config: HttpClientConfig,
     name: String,
-    httpMetrics: HttpMetrics[String],
+    httpMetrics: HttpMetrics[NoLoggingContext],
     retryConfig: RetryConfig,
     clock: Clock,
     awsRequestSigner: Option[AwsRequestSigner]
 )(
     implicit system: ActorSystem
-) extends LoggingHttpClient[String](
+) extends LoggingHttpClient[NoLoggingContext](
       config,
       name,
       httpMetrics,
       retryConfig,
       clock,
-      Logger.takingImplicit(LoggerFactory.getLogger(getClass.getName))((msg: String, _: String) => msg),
+      Logger.takingImplicit(LoggerFactory.getLogger(getClass.getName))((msg: String, _: NoLoggingContext) => msg),
       awsRequestSigner
     ) {
   override def request(
@@ -41,7 +41,7 @@ class HttpClient(
       headers: immutable.Seq[HttpHeader],
       deadline: Deadline,
       queryString: Option[String]
-  )(implicit executionContext: ExecutionContext, ctx: String = ""): Future[HttpClientResponse] =
+  )(implicit executionContext: ExecutionContext, ctx: NoLoggingContext): Future[HttpClientResponse] =
     super.request(method, entity, path, headers, deadline, queryString)
 }
 
@@ -69,7 +69,6 @@ abstract class HttpLayer[LoggingContext](
 )(
     implicit system: ActorSystem
 ) {
-
   protected def sendRequest: HttpRequest => Future[HttpResponse]
 
   def request(
@@ -129,7 +128,7 @@ abstract class HttpLayer[LoggingContext](
     case other                                                                   => Future.successful(HttpClientError(other))
   }
 
-  private def strictify(response: HttpResponse)(implicit ec: ExecutionContext): Future[HttpResponse] = {
+  private[this] def strictify(response: HttpResponse)(implicit ec: ExecutionContext): Future[HttpResponse] = {
     implicit val materializer: ActorMaterializer = ActorMaterializer()
     response.toStrict(retryConfig.strictifyResponseTimeout)
   }
@@ -206,7 +205,7 @@ abstract class HttpLayer[LoggingContext](
       httpMetrics.meterResponse(request.method, request.uri.path, response)
       logger.debug(s"[$name] Received response ${response.status} from ${request.method.value} ${request.uri}.")
     case Failure(e) =>
-      logger.info(s"[$name] Exception in Gateway for ${request.method.value} ${request.uri}: ${e.getMessage}", e)
+      logger.info(s"[$name] Exception for ${request.method.value} ${request.uri}: ${e.getMessage}", e)
   }
 }
 
