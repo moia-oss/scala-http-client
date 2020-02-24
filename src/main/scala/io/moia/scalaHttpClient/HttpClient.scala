@@ -60,7 +60,7 @@ class LoggingHttpClient[LoggingContext](
 
 abstract class HttpLayer[LoggingContext](
     config: HttpClientConfig,
-    val name: String,
+    name: String,
     httpMetrics: HttpMetrics[LoggingContext],
     retryConfig: RetryConfig,
     clock: Clock,
