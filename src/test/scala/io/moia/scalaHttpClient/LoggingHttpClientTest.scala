@@ -39,7 +39,7 @@ class LoggingHttpClientTest extends TestSetup {
     "take a customer logger" in {
       // given
       val testHttpClient =
-        new LoggingHttpClient[LoggingContext](httpClientConfig, "TestGateway", typedHttpMetrics, retryConfig, clock, None) {
+        new LoggingHttpClient[LoggingContext](httpClientConfig, "TestGateway", typedHttpMetrics, retryConfig, clock, theLogger, None) {
           override def sendRequest: HttpRequest => Future[HttpResponse] = (_: HttpRequest) => Future.successful(HttpResponse())
         }
 

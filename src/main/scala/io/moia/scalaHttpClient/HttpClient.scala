@@ -25,9 +25,14 @@ class HttpClient(
     awsRequestSigner: Option[AwsRequestSigner]
 )(
     implicit system: ActorSystem
-) extends LoggingHttpClient[String](config, gatewayType, httpMetrics, retryConfig, clock, awsRequestSigner)(
-      system,
-      Logger.takingImplicit(LoggerFactory.getLogger(getClass.getName))((msg: String, _: String) => msg)
+) extends LoggingHttpClient[String](
+      config,
+      gatewayType,
+      httpMetrics,
+      retryConfig,
+      clock,
+      Logger.takingImplicit(LoggerFactory.getLogger(getClass.getName))((msg: String, _: String) => msg),
+      awsRequestSigner
     ) {
   override def request(
       method: HttpMethod,
@@ -46,9 +51,10 @@ class LoggingHttpClient[LoggingContext](
     httpMetrics: HttpMetrics[LoggingContext],
     retryConfig: RetryConfig,
     clock: Clock,
+    logger: LoggerTakingImplicit[LoggingContext],
     awsRequestSigner: Option[AwsRequestSigner]
-)(implicit system: ActorSystem, logger: LoggerTakingImplicit[LoggingContext])
-    extends HttpLayer(config, gatewayType, httpMetrics, retryConfig, clock, awsRequestSigner) {
+)(implicit system: ActorSystem)
+    extends HttpLayer(config, gatewayType, httpMetrics, retryConfig, clock, logger, awsRequestSigner) {
   override protected def sendRequest: HttpRequest => Future[HttpResponse] = Http().singleRequest(_)
 }
 
@@ -58,10 +64,10 @@ abstract class HttpLayer[LoggingContext](
     httpMetrics: HttpMetrics[LoggingContext],
     retryConfig: RetryConfig,
     clock: Clock,
+    logger: LoggerTakingImplicit[LoggingContext],
     awsRequestSigner: Option[AwsRequestSigner] = None
 )(
-    implicit system: ActorSystem,
-    logger: LoggerTakingImplicit[LoggingContext]
+    implicit system: ActorSystem
 ) {
 
   protected def sendRequest: HttpRequest => Future[HttpResponse]
