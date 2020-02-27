@@ -7,6 +7,28 @@ jobs:
     steps:
       - checkout
       - run: sbt "scalafmtCheckAll"
+
+  compile:
+    docker:
+      - image: moia/scala-on-circleci:java8-scala2.13
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.sbt" }}
+            - v1-dependencies-
+
+      - run: sbt +compile
+
+      - save_cache:
+          key: v1-dependencies-{{ checksum "build.sbt" }}
+          paths:
+            - ~/.m2
+            - ~/.ivy2
+            - ~/.sbt
+            - ~/.cache/coursier/
+
   test:
     docker:
       - image: moia/scala-on-circleci:java8-scala2.13
@@ -19,6 +41,27 @@ jobs:
             - v1-dependencies-
 
       - run: sbt +test
+
+      - save_cache:
+          key: v1-dependencies-{{ checksum "build.sbt" }}
+          paths:
+            - ~/.m2
+            - ~/.ivy2
+            - ~/.sbt
+            - ~/.cache/coursier/
+
+  compile-examples:
+    docker:
+      - image: moia/scala-on-circleci:java8-scala2.13
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.sbt" }}
+            - v1-dependencies-
+
+      - run: sbt +it:compile
 
       - save_cache:
           key: v1-dependencies-{{ checksum "build.sbt" }}
@@ -54,5 +97,7 @@ workflows:
   build_and_test:
     jobs:
       - formatting
+      - compile
       - test
+      - compile-examples
       - scapegoat

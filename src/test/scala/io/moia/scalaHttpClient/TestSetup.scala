@@ -25,12 +25,12 @@ trait TestSetup extends AnyWordSpecLike with Matchers with FutureValues {
 
   val retryConfig: RetryConfig =
     RetryConfig(
-      retriesTooManyRequests = 2,
+      retriesTooManyRequests    = 2,
       retriesServiceUnavailable = 0,
-      retriesRequestTimeout = 0,
-      retriesServerError = 0,
-      retriesException = 3,
-      initialBackoff = 10.millis,
-      strictifyResponseTimeout = 1.second
+      retriesRequestTimeout     = 0,
+      retriesServerError        = 0,
+      retriesException          = 3,
+      initialBackoff            = 10.millis,
+      strictifyResponseTimeout  = 1.second
     )
 }

@@ -13,13 +13,13 @@ class StatusCodesTest extends TestSetup with MockServer {
 
   override val retryConfig: RetryConfig =
     RetryConfig(
-      retriesTooManyRequests = 2,
+      retriesTooManyRequests    = 2,
       retriesServiceUnavailable = 2,
-      retriesRequestTimeout = 2,
-      retriesServerError = 2,
-      retriesException = 3,
-      initialBackoff = 10.millis,
-      strictifyResponseTimeout = 1.second
+      retriesRequestTimeout     = 2,
+      retriesServerError        = 2,
+      retriesException          = 3,
+      initialBackoff            = 10.millis,
+      strictifyResponseTimeout  = 1.second
     )
 
   override implicit val defaultAwaitDuration: FiniteDuration = 1.second

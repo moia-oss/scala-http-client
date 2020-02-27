@@ -10,10 +10,10 @@ trait MockServer extends BeforeAndAfterEach with BeforeAndAfterAll { self: Suite
 
   val mockServerHttpClientConfig: HttpClientConfig =
     HttpClientConfig(
-      scheme = "http",
+      scheme             = "http",
       isSecureConnection = false,
-      host = "127.0.0.1",
-      port = mockServerPort
+      host               = "127.0.0.1",
+      port               = mockServerPort
     )
 
   private var clientAndServer: Option[ClientAndServer] = None

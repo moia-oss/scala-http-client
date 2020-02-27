@@ -18,8 +18,11 @@ lazy val root = (project in file("."))
     libraryDependencies ++= akkaDependencies ++ awsDependencies ++ testDependencies ++ loggingDependencies ++ otherDependencies
   )
   .settings(sonatypeSettings: _*)
+  .configs(IntegrationTest)
   .settings(
-    scalafmtOnCompile := true
+    scalafmtOnCompile := true,
+    Defaults.itSettings,
+    scalacOptions in IntegrationTest := (scalacOptions in Compile).value.filterNot(_ == "-Ywarn-dead-code"),
   )
 
 val akkaVersion     = "2.5.29"

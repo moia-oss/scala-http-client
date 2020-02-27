@@ -19,25 +19,87 @@ libraryDependencies += "io.moia" % "scala-http-client" % "1.2.0"
 ```
 
 ```scala
-implicit val system: ActorSystem                = ActorSystem("test")
-implicit val executionContext: ExecutionContext = system.dispatcher
-
-val httpClientConfig: HttpClientConfig = HttpClientConfig("http", isSecureConnection = false, "127.0.0.1", 8888)
-val clock: Clock                       = Clock.systemUTC()
-val httpMetrics: HttpMetrics[NoLoggingContext]   = new HttpMetrics[NoLoggingContext] {
-  override def meterResponse(method: HttpMethod, path: Uri.Path, response: HttpResponse)(implicit ctx: NoLoggingContext): Unit = ()
+// create the client
+val httpClient = new HttpClient(
+  config           = HttpClientConfig("http", isSecureConnection = false, "127.0.0.1", 8888),
+  name             = "TestClient",
+  httpMetrics      = HttpMetrics.none,
+  retryConfig      = RetryConfig.default,
+  clock            = Clock.systemUTC(),
+  awsRequestSigner = None
+)
+// make a request
+val response: Future[HttpClientResponse] = httpClient.request(
+  method   = HttpMethods.POST,
+  entity   = HttpEntity.apply("Example"),
+  path     = "/test",
+  headers  = immutable.Seq.empty,
+  deadline = Deadline.now + 10.seconds
+)
+// map the response to your model
+response.flatMap {
+  case HttpClientSuccess(content) => Unmarshal(content).to[MySuccessObject].map(Right(_))
+  case DomainError(content)       => Unmarshal(content).to[DomainErrorObject].map(Left(_))
+  case failure: HttpClientFailure => throw GatewayException(failure.toString)
 }
-val retryConfig: RetryConfig =
-    RetryConfig(
-      retriesTooManyRequests = 2,
-      retriesServiceUnavailable = 3,
-      retriesRequestTimeout = 1,
-      retriesServerError = 3,
-      retriesException = 3,
-      initialBackoff = 10.millis,
-      strictifyResponseTimeout = 1.second
-    )
-val awsRequestSigner: AwsRequestSigner = AwsRequestSigner.fromConfig(AwsRequestSignerConfig.BasicCredentials("example", "secret-key", "eu-central-1"))
+```
+
+See [SimpleExample.scala](/blob/master/src/it/scala/io/moia/scalaHttpClient/SimpleExample.scala) for a complete example.
+
+## Custom Logging
+
+To use a custom logger (for correlation ids etc), you can use the typed `LoggingHttpClient`. 
+First create a custom `LoggerTakingImplicit`:
+
+```scala
+import com.typesafe.scalalogging._
+import org.slf4j.LoggerFactory
+
+object CustomLogging {
+  case class LoggingContext(context: String)
+
+  implicit val canLogString: CanLog[LoggingContext] = new CanLog[LoggingContext] {
+    override def logMessage(originalMsg: String, ctx: LoggingContext): String = ???
+    override def afterLog(ctx: LoggingContext): Unit                          = ???
+  }
+
+  val theLogger: LoggerTakingImplicit[LoggingContext] = Logger.takingImplicit(LoggerFactory.getLogger(getClass.getName))
+}
+``` 
+
+Then create a `LoggingHttpClient` typed to the `LoggingContext`:
+
+```scala
+// create the client
+val httpClient = new LoggingHttpClient[LoggingContext](
+  config           = HttpClientConfig("http", isSecureConnection = false, "127.0.0.1", 8888),
+  name             = "TestClient",
+  httpMetrics      = HttpMetrics.none[LoggingContext],
+  retryConfig      = RetryConfig.default,
+  clock            = Clock.systemUTC(),
+  logger           = CustomLogging.theLogger,
+  awsRequestSigner = None
+)
+
+// create an implicit logging context
+implicit val ctx: LoggingContext = LoggingContext("Logging Context")
+
+// make a request
+httpClient.request(HttpMethods.POST, HttpEntity.Empty, "/test", immutable.Seq.empty, Deadline.now + 10.seconds)
+```
+
+The `request` function will use the `ctx` implicitly.
+
+See [LoggingExample.scala](/blob/master/src/it/scala/io/moia/scalaHttpClient/LoggingExample.scala) for a complete example.
+
+
+## Custom Headers
+
+To use custom-defined headers, you can extend `ModeledCustomHeader` from `akka.http.scaladsl.model.headers`:
+
+```scala
+import akka.http.scaladsl.model.headers.{ModeledCustomHeader, ModeledCustomHeaderCompanion}
+import scala.util.Try
 
 final class CustomHeader(id: String) extends ModeledCustomHeader[CustomHeader] {
   override def renderInRequests(): Boolean                           = true
@@ -49,38 +111,27 @@ object CustomHeader extends ModeledCustomHeaderCompanion[CustomHeader] {
   override def name: String                            = "custom-header"
   override def parse(value: String): Try[CustomHeader] = Try(new CustomHeader(value))
 }
-val httpClient = new HttpClient(httpClientConfig, "TestGateway", httpMetrics, retryConfig, clock, Some(awsRequestSigner))
-
-val response = testHttpClient.request(HttpMethods.POST, HttpEntity.apply("Example"), "/test", immutable.Seq(new CustomHeader("foobar")), Deadline.now + 10.seconds)
-
-response.flatMap {
-  case HttpClientSuccess(content) => Unmarshal(content).to[MySuccessObject].map(Right(_))
-  case DomainError(content)       => Unmarshal(content).to[DomainErrorObject].map(Left(_))
-  case failure: HttpClientFailure => throw GatewayException(failure.toString)
-}
 ```
 
-## Custom Logging
-
-To use a custom logger (for correlation ids etc), you can use the typed `LoggingHttpClient`:
+Then simply send them in the request:
 
 ```scala
-// create a context-class
-case class LoggingContext(context: String)
-
-// create a logger
-implicit val canLogString: CanLog[LoggingContext]   = new CanLog[LoggingContext] // override logMessage here!
-val theLogger: LoggerTakingImplicit[LoggingContext] = Logger.takingImplicit(LoggerFactory.getLogger(getClass.getName))
-
-// create the client
-new LoggingHttpClient[LoggingContext](httpClientConfig, "TestGateway", typedHttpMetrics, retryConfig, clock, theLogger, None)
-
-// create an implicit logging context
-implicit val ctx: LoggingContext                             = LoggingContext("Logging Context")
-
-// make a request
-testHttpClient.request(HttpMethods.POST, HttpEntity.Empty, "/test", immutable.Seq.empty, Deadline.now + 10.seconds)
+val response: Future[HttpClientResponse] = httpClient.request(
+  method   = HttpMethods.POST,
+  entity   = HttpEntity.apply("Example"),
+  path     = "/test",
+  headers  = immutable.Seq(new CustomHeader("foobar")),
+  deadline = Deadline.now + 10.seconds
+)
 ```
+
+Note: If you want to access the headers from the _response_, you can do so from the data inside the `HttpClientSuccess`:
+
+```scala
+case HttpClientSuccess(content) => content.headers
+```
+
+See [HeaderExample.scala](/blob/master/src/it/scala/io/moia/scalaHttpClient/HeaderExample.scala) for a complete example.
 
 ## Publishing
 
