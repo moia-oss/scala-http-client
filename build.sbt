@@ -2,7 +2,7 @@ lazy val root = (project in file("."))
   .settings(
     name := "scala-http-client",
     organization := "io.moia",
-    version := "1.1.0",
+    version := "1.2.0-SNAPSHOT",
     licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0")),
     scmInfo := Some(ScmInfo(url("https://github.com/moia-dev/scala-http-client"), "scm:git@github.com:moia-dev/scala-http-client.git")),
     homepage := Some(url("https://github.com/moia-dev/scala-http-client")),
