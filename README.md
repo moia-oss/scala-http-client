@@ -15,7 +15,7 @@ This is a wrapper around the akka-http-client that adds
 ## Usage
 
 ```sbt
-libraryDependencies += "io.moia" % "scala-http-client" % "1.1.0"
+libraryDependencies += "io.moia" % "scala-http-client" % "1.2.0"
 ```
 
 ```scala
@@ -69,11 +69,11 @@ To use a custom logger (for correlation ids etc), you can use the typed `Logging
 case class LoggingContext(context: String)
 
 // create a logger
-implicit val canLogString: CanLog[LoggingContext]            = new CanLog[LoggingContext] // override logMessage here!
-implicit val theLogger: LoggerTakingImplicit[LoggingContext] = Logger.takingImplicit(LoggerFactory.getLogger(getClass.getName))
+implicit val canLogString: CanLog[LoggingContext]   = new CanLog[LoggingContext] // override logMessage here!
+val theLogger: LoggerTakingImplicit[LoggingContext] = Logger.takingImplicit(LoggerFactory.getLogger(getClass.getName))
 
 // create the client
-new LoggingHttpClient[LoggingContext](httpClientConfig, "TestGateway", typedHttpMetrics, retryConfig, clock, None)
+new LoggingHttpClient[LoggingContext](httpClientConfig, "TestGateway", typedHttpMetrics, retryConfig, clock, theLogger, None)
 
 // create an implicit logging context
 implicit val ctx: LoggingContext                             = LoggingContext("Logging Context")
