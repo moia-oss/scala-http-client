@@ -35,9 +35,9 @@ object AwsRequestSigner extends StrictLogging {
   sealed trait AwsRequestSignerConfig
 
   object AwsRequestSignerConfig {
-    final case class AssumeRole(roleArn: String, roleSessionName: String, awsRegion: String)   extends AwsRequestSignerConfig
+    final case class AssumeRole(roleArn: String, roleSessionName: String, awsRegion: String) extends AwsRequestSignerConfig
     final case class BasicCredentials(accessKey: String, secretKey: String, awsRegion: String) extends AwsRequestSignerConfig
-    final case class Instance(awsRegion: String)                                               extends AwsRequestSignerConfig
+    final case class Instance(awsRegion: String) extends AwsRequestSignerConfig
   }
 
   def fromConfig(config: AwsRequestSignerConfig)(implicit mat: Materializer): AwsRequestSigner =

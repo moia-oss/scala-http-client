@@ -1,8 +1,8 @@
 package io.moia.scalaHttpClient
 
-import AwsRequestSigner.AwsRequestSignerConfig
+import io.moia.scalaHttpClient.AwsRequestSigner.AwsRequestSignerConfig
 
-import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.duration.{FiniteDuration, _}
 
 /**
   * Configuration of a particular HTTP client.
@@ -13,7 +13,7 @@ final case class HttpClientConfig(
     host: String,
     port: Int,
     awsRequestSignerConfig: Option[AwsRequestSignerConfig] = None,
-    defaultDeadline: Option[FiniteDuration] = None
+    defaultDeadline: Option[FiniteDuration]                = None
 )
 
 /**
@@ -28,3 +28,15 @@ final case class RetryConfig(
     initialBackoff: FiniteDuration,
     strictifyResponseTimeout: FiniteDuration
 )
+
+object RetryConfig {
+  val default: RetryConfig = RetryConfig(
+    retriesTooManyRequests    = 2,
+    retriesServiceUnavailable = 3,
+    retriesRequestTimeout     = 1,
+    retriesServerError        = 3,
+    retriesException          = 3,
+    initialBackoff            = 10.millis,
+    strictifyResponseTimeout  = 1.second
+  )
+}
