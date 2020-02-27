@@ -44,7 +44,7 @@ response.flatMap {
 }
 ```
 
-See [SimpleExample.scala](/blob/master/src/it/scala/io/moia/scalaHttpClient/SimpleExample.scala) for a complete example.
+See [SimpleExample.scala](/src/it/scala/io/moia/scalaHttpClient/SimpleExample.scala) for a complete example.
 
 ## Custom Logging
 
@@ -90,7 +90,7 @@ httpClient.request(HttpMethods.POST, HttpEntity.Empty, "/test", immutable.Seq.em
 
 The `request` function will use the `ctx` implicitly.
 
-See [LoggingExample.scala](/blob/master/src/it/scala/io/moia/scalaHttpClient/LoggingExample.scala) for a complete example.
+See [LoggingExample.scala](/src/it/scala/io/moia/scalaHttpClient/LoggingExample.scala) for a complete example.
 
 
 ## Custom Headers
@@ -131,7 +131,7 @@ Note: If you want to access the headers from the _response_, you can do so from 
 case HttpClientSuccess(content) => content.headers
 ```
 
-See [HeaderExample.scala](/blob/master/src/it/scala/io/moia/scalaHttpClient/HeaderExample.scala) for a complete example.
+See [HeaderExample.scala](/src/it/scala/io/moia/scalaHttpClient/HeaderExample.scala) for a complete example.
 
 ## Publishing
 
