@@ -2,7 +2,7 @@ lazy val root = (project in file("."))
   .settings(
     name := "scala-http-client",
     organization := "io.moia",
-    version := "1.2.0-SNAPSHOT",
+    version := "1.2.0",
     licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0")),
     scmInfo := Some(ScmInfo(url("https://github.com/moia-dev/scala-http-client"), "scm:git@github.com:moia-dev/scala-http-client.git")),
     homepage := Some(url("https://github.com/moia-dev/scala-http-client")),
@@ -32,15 +32,15 @@ lazy val akkaDependencies = Seq(
   "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion % Test
 )
 
-lazy val awsJavaSdkVersion = "1.11.726"
+lazy val awsJavaSdkVersion = "1.11.731"
 lazy val awsDependencies = Seq(
   "com.amazonaws" % "aws-java-sdk-core" % awsJavaSdkVersion,
   "com.amazonaws" % "aws-java-sdk-sts"  % awsJavaSdkVersion
 )
 
 lazy val testDependencies = Seq(
-  "org.scalatest"   %% "scalatest"       % "3.1.0"  % Test,
-  "org.mockito"     %% "mockito-scala"   % "1.11.2" % Test,
+  "org.scalatest"   %% "scalatest"       % "3.1.1"  % Test,
+  "org.mockito"     %% "mockito-scala"   % "1.11.3" % Test,
   "org.mock-server" % "mockserver-netty" % "5.9.0"  % Test
 )
 
