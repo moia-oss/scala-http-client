@@ -32,14 +32,14 @@ class LoggingHttpClientTest extends TestSetup {
       } else MDC.remove("context")
   }
 
-  private implicit val theLogger: LoggerTakingImplicit[LoggingContext] = Logger.takingImplicit(LoggerFactory.getLogger(getClass.getName))
-  private implicit val ctx: LoggingContext                             = LoggingContext("Logging Context")
+  private val theLogger: LoggerTakingImplicit[LoggingContext] = Logger.takingImplicit(LoggerFactory.getLogger(getClass.getName))
+  private implicit val ctx: LoggingContext                    = LoggingContext("Logging Context")
 
   classOf[LoggingHttpClient[LoggingContext]].getSimpleName should {
     "take a customer logger" in {
       // given
       val testHttpClient =
-        new LoggingHttpClient[LoggingContext](httpClientConfig, "TestGateway", typedHttpMetrics, retryConfig, clock, None) {
+        new LoggingHttpClient[LoggingContext](httpClientConfig, "TestGateway", typedHttpMetrics, retryConfig, clock, theLogger, None) {
           override def sendRequest: HttpRequest => Future[HttpResponse] = (_: HttpRequest) => Future.successful(HttpResponse())
         }
 
