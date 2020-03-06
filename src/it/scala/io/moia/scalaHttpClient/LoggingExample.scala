@@ -8,7 +8,6 @@ import com.typesafe.scalalogging._
 import io.moia.scalaHttpClient.CustomLogging.LoggingContext
 import org.slf4j.LoggerFactory
 
-import scala.collection.compat._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
