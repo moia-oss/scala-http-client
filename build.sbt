@@ -2,7 +2,7 @@ lazy val root = (project in file("."))
   .settings(
     name := "scala-http-client",
     organization := "io.moia",
-    version := "1.3.0",
+    version := "1.3.1",
     licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0")),
     scmInfo := Some(ScmInfo(url("https://github.com/moia-dev/scala-http-client"), "scm:git@github.com:moia-dev/scala-http-client.git")),
     homepage := Some(url("https://github.com/moia-dev/scala-http-client")),
@@ -48,8 +48,7 @@ lazy val testDependencies = Seq(
 )
 
 lazy val loggingDependencies = Seq(
-  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2"  % Compile,
-  "org.slf4j"                  % "slf4j-simple"   % "1.7.30" % Compile
+  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2"
 )
 
 scapegoatVersion in ThisBuild := "1.4.1"
