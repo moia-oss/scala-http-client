@@ -21,7 +21,7 @@ trait TestSetup extends AnyWordSpecLike with Matchers with FutureValues {
     override def meterResponse(method: HttpMethod, path: Uri.Path, response: HttpResponse)(implicit ctx: NoLoggingContext): Unit = ()
   }
 
-  val httpClientConfig: HttpClientConfig = HttpClientConfig("http", isSecureConnection = false, "127.0.0.1", 8888)
+  val httpClientConfig: HttpClientConfig = HttpClientConfig("http", "127.0.0.1", 8888)
 
   val retryConfig: RetryConfig =
     RetryConfig(
