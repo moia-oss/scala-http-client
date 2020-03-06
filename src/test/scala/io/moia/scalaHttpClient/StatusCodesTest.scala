@@ -11,23 +11,13 @@ import scala.concurrent.duration._
 
 class StatusCodesTest extends TestSetup with MockServer {
 
-  override val retryConfig: RetryConfig =
-    RetryConfig(
-      retriesTooManyRequests    = 2,
-      retriesServiceUnavailable = 2,
-      retriesRequestTimeout     = 2,
-      retriesServerError        = 2,
-      retriesException          = 3,
-      initialBackoff            = 10.millis,
-      strictifyResponseTimeout  = 1.second
-    )
-
   override implicit val defaultAwaitDuration: FiniteDuration = 1.second
 
   "respect retry configuration" when {
     s"the server responds with ${StatusCodes.TooManyRequests}" in {
       // Given
-      val httpClient = new HttpClient(mockServerHttpClientConfig, "TestGateway", httpMetrics, retryConfig, clock, None)
+      val retryConfig = RetryConfig.default.copy(retriesTooManyRequests = 2)
+      val httpClient  = new HttpClient(mockServerHttpClientConfig, "TestGateway", httpMetrics, retryConfig, clock, None)
 
       // status 429
       getClientAndServer
@@ -44,7 +34,8 @@ class StatusCodesTest extends TestSetup with MockServer {
     }
 
     s"the server responds with ${StatusCodes.ServiceUnavailable}" in {
-      val httpClient = new HttpClient(mockServerHttpClientConfig, "Dispatching2", httpMetrics, retryConfig, clock, None)
+      val retryConfig = RetryConfig.default.copy(retriesServiceUnavailable = 2)
+      val httpClient  = new HttpClient(mockServerHttpClientConfig, "Dispatching2", httpMetrics, retryConfig, clock, None)
 
       getClientAndServer
         .when(request().withPath("/test").withMethod("POST"), Times.unlimited())
@@ -60,7 +51,8 @@ class StatusCodesTest extends TestSetup with MockServer {
     }
 
     s"the server responds with ${StatusCodes.RequestTimeout}" in {
-      val httpClient = new HttpClient(mockServerHttpClientConfig, "Dispatching2", httpMetrics, retryConfig, clock, None)
+      val retryConfig = RetryConfig.default.copy(retriesRequestTimeout = 2)
+      val httpClient  = new HttpClient(mockServerHttpClientConfig, "Dispatching2", httpMetrics, retryConfig, clock, None)
 
       getClientAndServer
         .when(request().withPath("/test").withMethod("POST"), Times.unlimited())
@@ -76,7 +68,8 @@ class StatusCodesTest extends TestSetup with MockServer {
     }
 
     s"the server responds with ${StatusCodes.InternalServerError}" in {
-      val httpClient = new HttpClient(mockServerHttpClientConfig, "Dispatching2", httpMetrics, retryConfig, clock, None)
+      val retryConfig = RetryConfig.default.copy(retriesInternalServerError = 2)
+      val httpClient  = new HttpClient(mockServerHttpClientConfig, "Dispatching2", httpMetrics, retryConfig, clock, None)
 
       getClientAndServer
         .when(request().withPath("/test").withMethod("POST"), Times.unlimited())
