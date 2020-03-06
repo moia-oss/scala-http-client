@@ -10,7 +10,6 @@ import akka.stream.ActorMaterializer
 import com.typesafe.scalalogging.{Logger, LoggerTakingImplicit}
 import org.slf4j.LoggerFactory
 
-import scala.collection.immutable
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
@@ -38,7 +37,7 @@ class HttpClient(
       method: HttpMethod,
       entity: MessageEntity,
       path: String,
-      headers: immutable.Seq[HttpHeader],
+      headers: Seq[HttpHeader],
       deadline: Deadline,
       queryString: Option[String]
   )(implicit executionContext: ExecutionContext, ctx: NoLoggingContext): Future[HttpClientResponse] =
@@ -75,7 +74,7 @@ abstract class HttpLayer[LoggingContext](
       method: HttpMethod,
       entity: RequestEntity,
       path: String,
-      headers: immutable.Seq[HttpHeader],
+      headers: Seq[HttpHeader],
       deadline: Deadline,
       queryString: Option[String] = None
   )(
@@ -92,11 +91,11 @@ abstract class HttpLayer[LoggingContext](
       method: HttpMethod,
       entity: RequestEntity,
       path: String,
-      headers: immutable.Seq[HttpHeader],
+      headers: Seq[HttpHeader],
       queryString: Option[String]
   ): Future[HttpRequest] = {
     val uri     = Uri.from(config.scheme, "", config.host, config.port, path, queryString)
-    val request = HttpRequest(method, uri, headers, entity)
+    val request = HttpRequest(method, uri, headers.toVector, entity)
 
     awsRequestSigner match {
       case Some(signer) => signer.signRequest(request)

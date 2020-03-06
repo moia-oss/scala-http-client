@@ -8,7 +8,7 @@ import com.typesafe.scalalogging._
 import io.moia.scalaHttpClient.CustomLogging.LoggingContext
 import org.slf4j.LoggerFactory
 
-import scala.collection.immutable
+import scala.collection.compat._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
@@ -29,7 +29,7 @@ object Example {
 
   // create the client
   val httpClient = new LoggingHttpClient[LoggingContext](
-    config           = HttpClientConfig("http", isSecureConnection = false, "127.0.0.1", 8888),
+    config           = HttpClientConfig("http", "127.0.0.1", 8888),
     name             = "TestClient",
     httpMetrics      = HttpMetrics.none[LoggingContext],
     retryConfig      = RetryConfig.default,
@@ -42,5 +42,5 @@ object Example {
   implicit val ctx: LoggingContext = LoggingContext("Logging Context")
 
   // make a request
-  httpClient.request(HttpMethods.POST, HttpEntity.Empty, "/test", immutable.Seq.empty, Deadline.now + 10.seconds)
+  httpClient.request(HttpMethods.POST, HttpEntity.Empty, "/test", Seq.empty, Deadline.now + 10.seconds)
 }

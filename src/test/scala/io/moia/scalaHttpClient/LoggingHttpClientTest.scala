@@ -4,7 +4,6 @@ import akka.http.scaladsl.model._
 import com.typesafe.scalalogging.{CanLog, Logger, LoggerTakingImplicit}
 import org.slf4j.{LoggerFactory, MDC}
 
-import scala.collection.immutable
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
@@ -45,7 +44,7 @@ class LoggingHttpClientTest extends TestSetup {
 
       // when
       val _ =
-        testHttpClient.request(HttpMethods.POST, HttpEntity.Empty, "/test", immutable.Seq.empty, Deadline.now + 10.seconds).futureValue
+        testHttpClient.request(HttpMethods.POST, HttpEntity.Empty, "/test", Seq.empty, Deadline.now + 10.seconds).futureValue
 
       // then succeed if it compiles
       succeed

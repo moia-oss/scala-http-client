@@ -9,7 +9,7 @@ import akka.http.scaladsl.unmarshalling.{Unmarshal, Unmarshaller}
 import akka.stream.ActorMaterializer
 import io.moia.scalaHttpClient.ExampleModel.{DomainErrorObject, GatewayException, MySuccessObject}
 
-import scala.collection.immutable
+import scala.collection.compat._
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -35,7 +35,7 @@ object HeaderExample {
 
   // create the client
   val httpClient = new HttpClient(
-    config           = HttpClientConfig("http", isSecureConnection = false, "127.0.0.1", 8888),
+    config           = HttpClientConfig("http", "127.0.0.1", 8888),
     name             = "TestClient",
     httpMetrics      = HttpMetrics.none,
     retryConfig      = RetryConfig.default,
@@ -48,7 +48,7 @@ object HeaderExample {
     method   = HttpMethods.POST,
     entity   = HttpEntity.apply("Example"),
     path     = "/test",
-    headers  = immutable.Seq(new CustomHeader("foobar")),
+    headers  = Seq(new CustomHeader("foobar")),
     deadline = Deadline.now + 10.seconds
   )
 

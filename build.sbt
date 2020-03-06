@@ -22,7 +22,7 @@ lazy val root = (project in file("."))
   .settings(
     scalafmtOnCompile := true,
     Defaults.itSettings,
-    scalacOptions in IntegrationTest := (scalacOptions in Compile).value.filterNot(_ == "-Ywarn-dead-code"),
+    scalacOptions in IntegrationTest := (scalacOptions in Compile).value.filterNot(_ == "-Ywarn-dead-code")
   )
 
 val akkaVersion     = "2.5.29"
@@ -48,8 +48,8 @@ lazy val testDependencies = Seq(
 )
 
 lazy val loggingDependencies = Seq(
-  "com.typesafe.scala-logging" %% "scala-logging"  % "3.9.2" % Compile,
-  "org.slf4j"                  % "slf4j-simple"    % "1.7.30" % Compile
+  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2"  % Compile,
+  "org.slf4j"                  % "slf4j-simple"   % "1.7.30" % Compile
 )
 
 lazy val otherDependencies = Seq(

@@ -21,7 +21,7 @@ libraryDependencies += "io.moia" %% "scala-http-client" % "1.2.0"
 ```scala
 // create the client
 val httpClient = new HttpClient(
-  config           = HttpClientConfig("http", isSecureConnection = false, "127.0.0.1", 8888),
+  config           = HttpClientConfig("http", "127.0.0.1", 8888),
   name             = "TestClient",
   httpMetrics      = HttpMetrics.none,
   retryConfig      = RetryConfig.default,
@@ -33,7 +33,7 @@ val response: Future[HttpClientResponse] = httpClient.request(
   method   = HttpMethods.POST,
   entity   = HttpEntity.apply("Example"),
   path     = "/test",
-  headers  = immutable.Seq.empty,
+  headers  = Seq.empty,
   deadline = Deadline.now + 10.seconds
 )
 // map the response to your model
@@ -72,7 +72,7 @@ Then create a `LoggingHttpClient` typed to the `LoggingContext`:
 ```scala
 // create the client
 val httpClient = new LoggingHttpClient[LoggingContext](
-  config           = HttpClientConfig("http", isSecureConnection = false, "127.0.0.1", 8888),
+  config           = HttpClientConfig("http", "127.0.0.1", 8888),
   name             = "TestClient",
   httpMetrics      = HttpMetrics.none[LoggingContext],
   retryConfig      = RetryConfig.default,
@@ -85,7 +85,7 @@ val httpClient = new LoggingHttpClient[LoggingContext](
 implicit val ctx: LoggingContext = LoggingContext("Logging Context")
 
 // make a request
-httpClient.request(HttpMethods.POST, HttpEntity.Empty, "/test", immutable.Seq.empty, Deadline.now + 10.seconds)
+httpClient.request(HttpMethods.POST, HttpEntity.Empty, "/test", Seq.empty, Deadline.now + 10.seconds)
 ```
 
 The `request` function will use the `ctx` implicitly.
@@ -120,7 +120,7 @@ val response: Future[HttpClientResponse] = httpClient.request(
   method   = HttpMethods.POST,
   entity   = HttpEntity.apply("Example"),
   path     = "/test",
-  headers  = immutable.Seq(new CustomHeader("foobar")),
+  headers  = Seq(new CustomHeader("foobar")),
   deadline = Deadline.now + 10.seconds
 )
 ```
