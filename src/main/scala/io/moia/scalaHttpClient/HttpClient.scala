@@ -123,7 +123,8 @@ abstract class HttpLayer[LoggingContext](
     case response @ HttpResponse(StatusCodes.Success(_), _, _, _)                => Future.successful(HttpClientSuccess(response))
     case response @ HttpResponse(StatusCodes.BadRequest, _, HttpEntity.Empty, _) => Future.successful(HttpClientError(response))
     case response @ HttpResponse(StatusCodes.BadRequest, _, _, _)                => Future.successful(DomainError(response))
-    case response @ HttpResponse(code, _, _, _) if shouldBeRetried(code)         => retryWithConfig(tryNumber, httpRequest, response, deadline)
+    case response @ HttpResponse(StatusCodes.ClientError(_), _, _, _)            => retryWithConfig(tryNumber, httpRequest, response, deadline)
+    case response @ HttpResponse(StatusCodes.ServerError(_), _, _, _)            => retryWithConfig(tryNumber, httpRequest, response, deadline)
     case other                                                                   => Future.successful(HttpClientError(other))
   }
 
@@ -132,16 +133,15 @@ abstract class HttpLayer[LoggingContext](
     response.toStrict(retryConfig.strictifyResponseTimeout)
   }
 
-  private[this] def shouldBeRetried(statusCode: StatusCode): Boolean =
-    Seq(StatusCodes.RequestTimeout, StatusCodes.TooManyRequests, StatusCodes.ServiceUnavailable, StatusCodes.InternalServerError)
-      .contains(statusCode)
-
   private[this] def retryCount(statusCode: StatusCode): Int = statusCode match {
     case StatusCodes.RequestTimeout      => retryConfig.retriesRequestTimeout
     case StatusCodes.TooManyRequests     => retryConfig.retriesTooManyRequests
+    case StatusCodes.ClientError(_)      => retryConfig.retriesClientError
+    case StatusCodes.InternalServerError => retryConfig.retriesInternalServerError
+    case StatusCodes.BadGateway          => retryConfig.retriesBadGateway
     case StatusCodes.ServiceUnavailable  => retryConfig.retriesServiceUnavailable
-    case StatusCodes.InternalServerError => retryConfig.retriesServerError
-    case _                               => retryConfig.retriesServerError
+    case StatusCodes.ServerError(_)      => retryConfig.retriesServerError
+    case _                               => 0 // default: don't retry weird/custom codes
   }
 
   private[this] def retryWithConfig(tryNum: Int, request: HttpRequest, response: HttpResponse, deadline: Deadline)(
