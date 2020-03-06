@@ -6,14 +6,17 @@ import scala.concurrent.duration.{FiniteDuration, _}
 
 /**
   * Configuration of a particular HTTP client.
+  *
+  * @param scheme For example "http" or "https"
+  * @param host Name of the host
+  * @param port Port of the host
+  * @param awsRequestSignerConfig Optional config for AWS request signing
   */
 final case class HttpClientConfig(
     scheme: String,
-    isSecureConnection: Boolean,
     host: String,
     port: Int,
-    awsRequestSignerConfig: Option[AwsRequestSignerConfig] = None,
-    defaultDeadline: Option[FiniteDuration]                = None
+    awsRequestSignerConfig: Option[AwsRequestSignerConfig] = None
 )
 
 /**
