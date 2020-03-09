@@ -133,7 +133,7 @@ abstract class HttpLayer[LoggingContext](
     response.toStrict(retryConfig.strictifyResponseTimeout)
   }
 
-  private[this] def retryCount(statusCode: StatusCode): Int = statusCode match {
+  private[this] def retryCount(statusCode: StatusCode)(implicit ctx: LoggingContext): Int = statusCode match {
     case StatusCodes.RequestTimeout      => retryConfig.retriesRequestTimeout
     case StatusCodes.TooManyRequests     => retryConfig.retriesTooManyRequests
     case StatusCodes.ClientError(_)      => retryConfig.retriesClientError
@@ -141,7 +141,7 @@ abstract class HttpLayer[LoggingContext](
     case StatusCodes.BadGateway          => retryConfig.retriesBadGateway
     case StatusCodes.ServiceUnavailable  => retryConfig.retriesServiceUnavailable
     case StatusCodes.ServerError(_)      => retryConfig.retriesServerError
-    case _                               => 0 // default: don't retry weird/custom codes
+    case code: StatusCode                => logger.debug(s"[$name] Not retrying code ${code.toString}."); 0
   }
 
   private[this] def retryWithConfig(tryNum: Int, request: HttpRequest, response: HttpResponse, deadline: Deadline)(
