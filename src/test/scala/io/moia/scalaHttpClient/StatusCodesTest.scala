@@ -35,7 +35,7 @@ class StatusCodesTest extends TestSetup with MockServer {
 
     s"the server responds with ${StatusCodes.ServiceUnavailable}" in {
       val retryConfig = RetryConfig.default.copy(retriesServiceUnavailable = 2)
-      val httpClient  = new HttpClient(mockServerHttpClientConfig, "Dispatching2", httpMetrics, retryConfig, clock, None)
+      val httpClient  = new HttpClient(mockServerHttpClientConfig, "TestClient", httpMetrics, retryConfig, clock, None)
 
       getClientAndServer
         .when(request().withPath("/test").withMethod("POST"), Times.unlimited())
@@ -52,7 +52,7 @@ class StatusCodesTest extends TestSetup with MockServer {
 
     s"the server responds with ${StatusCodes.RequestTimeout}" in {
       val retryConfig = RetryConfig.default.copy(retriesRequestTimeout = 2)
-      val httpClient  = new HttpClient(mockServerHttpClientConfig, "Dispatching2", httpMetrics, retryConfig, clock, None)
+      val httpClient  = new HttpClient(mockServerHttpClientConfig, "TestClient", httpMetrics, retryConfig, clock, None)
 
       getClientAndServer
         .when(request().withPath("/test").withMethod("POST"), Times.unlimited())
@@ -69,7 +69,7 @@ class StatusCodesTest extends TestSetup with MockServer {
 
     s"the server responds with ${StatusCodes.InternalServerError}" in {
       val retryConfig = RetryConfig.default.copy(retriesInternalServerError = 2)
-      val httpClient  = new HttpClient(mockServerHttpClientConfig, "Dispatching2", httpMetrics, retryConfig, clock, None)
+      val httpClient  = new HttpClient(mockServerHttpClientConfig, "TestClient", httpMetrics, retryConfig, clock, None)
 
       getClientAndServer
         .when(request().withPath("/test").withMethod("POST"), Times.unlimited())
@@ -83,11 +83,28 @@ class StatusCodesTest extends TestSetup with MockServer {
       getClientAndServer.verify(request().withPath("/test").withMethod("POST"), VerificationTimes.exactly(3))
       succeed
     }
+
+    s"the server responds with ${StatusCodes.ImATeapot}" in {
+      val retryConfig = RetryConfig.default.copy(retriesClientError = 2)
+      val httpClient  = new HttpClient(mockServerHttpClientConfig, "TestClient", httpMetrics, retryConfig, clock, None)
+
+      getClientAndServer
+        .when(request().withPath("/test").withMethod("POST"), Times.unlimited())
+        .respond(response().withStatusCode(418))
+
+      // When
+      val result = httpClient.request(HttpMethods.POST, HttpEntity.Empty, "/test", immutable.Seq.empty, Deadline.now + 10.seconds)
+
+      // Then
+      result.futureValue should matchPattern { case HttpClientError(_) => }
+      getClientAndServer.verify(request().withPath("/test").withMethod("POST"), VerificationTimes.exactly(3))
+      succeed
+    }
   }
 
   "not retry" when {
     "deadline would be exceeded" in {
-      val httpClient = new HttpClient(mockServerHttpClientConfig, "Dispatching2", httpMetrics, retryConfig, clock, None)
+      val httpClient = new HttpClient(mockServerHttpClientConfig, "TestClient", httpMetrics, retryConfig, clock, None)
 
       getClientAndServer
         .when(request().withPath("/test").withMethod("POST"), Times.unlimited())

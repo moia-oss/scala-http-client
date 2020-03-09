@@ -2,6 +2,7 @@ package io.moia.scalaHttpClient
 
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.{ModeledCustomHeader, ModeledCustomHeaderCompanion}
+import akka.http.scaladsl.unmarshalling.Unmarshal
 import com.typesafe.scalalogging.StrictLogging
 import io.moia.scalaHttpClient.AwsRequestSigner.AwsRequestSignerConfig
 import org.scalatest.{Inside, Inspectors}
@@ -78,6 +79,39 @@ class HttpClientTest extends TestSetup with Inside with StrictLogging {
         inside(dummyRequestWithFixResponseStatus(statusCode)) {
           case HttpClientSuccess(_) => succeed
         }
+      }
+    }
+
+    "return an HttpClientError on StatusCode 400 without an Entity" in {
+
+      val testHttpClient = new HttpClient(httpClientConfig, "TestGateway", httpMetrics, retryConfig, clock, None) {
+        override def sendRequest: HttpRequest => Future[HttpResponse] =
+          _ => Future.successful(HttpResponse().withStatus(400).withEntity(HttpEntity.Empty))
+      }
+
+      // When
+      val result: Future[HttpClientResponse] =
+        testHttpClient.request(HttpMethods.POST, HttpEntity.Empty, "/test", immutable.Seq.empty, Deadline.now + 10.seconds)
+
+      // Then
+      result.futureValue shouldBe a[HttpClientError]
+    }
+
+    "return a DomainError on StatusCode 400 with an Entity" in {
+
+      val testHttpClient = new HttpClient(httpClientConfig, "TestGateway", httpMetrics, retryConfig, clock, None) {
+        override def sendRequest: HttpRequest => Future[HttpResponse] =
+          _ => Future.successful(HttpResponse().withStatus(400).withEntity(HttpEntity("Test")))
+      }
+
+      // When
+      val result: Future[HttpClientResponse] =
+        testHttpClient.request(HttpMethods.POST, HttpEntity.Empty, "/test", immutable.Seq.empty, Deadline.now + 10.seconds)
+
+      // Then
+      result.futureValue shouldBe a[DomainError]
+      inside(result.futureValue) {
+        case DomainError(content) => Unmarshal(content.entity).to[String].futureValue shouldBe "Test"
       }
     }
 
