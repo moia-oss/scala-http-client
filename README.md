@@ -46,6 +46,19 @@ response.flatMap {
 
 See [SimpleExample.scala](/src/it/scala/io/moia/scalaHttpClient/SimpleExample.scala) for a complete example.
 
+## HttpClientResponses
+
+The lib outputs the following response objects (see `io.moia.scalaHttpClient.HttpClientResponse`):
+
+* HTTP 2xx Success => `HttpClientSuccess`
+* HTTP 3xx Redirect => not implemented yet
+* HTTP 400 Bad Request _with entity_ => is mapped to `DomainError` ⚠️
+* HTTP 400 Bad Request _without entity_ => `HttpClientError`
+* HTTP 4xx, 5xx, others => `HttpClientError`
+* if the deadline expired => `DeadlineExpired`
+* weird akka-errors => `ExceptionOccurred`
+
+
 ## Custom Logging
 
 To use a custom logger (for correlation ids etc), you can use the typed `LoggingHttpClient`. 
