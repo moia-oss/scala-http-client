@@ -25,7 +25,7 @@ lazy val root = (project in file("."))
     scalacOptions in IntegrationTest := (scalacOptions in Compile).value.filterNot(_ == "-Ywarn-dead-code")
   )
 
-val akkaVersion     = "2.5.29"
+val akkaVersion     = "2.6.3"
 val akkaHttpVersion = "10.1.11"
 
 lazy val akkaDependencies = Seq(
