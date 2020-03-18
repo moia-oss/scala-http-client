@@ -19,7 +19,7 @@ import scala.concurrent.{Await, Future, TimeoutException}
   * ```
   */
 trait FutureValues extends Assertions {
-  protected implicit val defaultAwaitDuration: FiniteDuration = 500.millis
+  protected implicit val defaultAwaitDuration: FiniteDuration = 1000.millis
 
   implicit class WithFutureValue[T](future: Future[T]) {
     def futureValue(implicit awaitDuration: Duration): T =
