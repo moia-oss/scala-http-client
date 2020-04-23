@@ -8,7 +8,6 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.model.HttpHeader.ParsingResult.Ok
 import akka.http.scaladsl.model.headers.Host
 import akka.http.scaladsl.model.{HttpHeader, HttpRequest, Uri}
-import akka.stream.ActorMaterializer
 import com.amazonaws.auth.{AWS4Signer, BasicAWSCredentials}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
@@ -17,7 +16,6 @@ import scala.concurrent.ExecutionContext
 
 class SignableHttpRequestTest extends AnyWordSpecLike with Matchers with FutureValues {
   private implicit def system: ActorSystem                = ActorSystem("test")
-  private implicit val mat: ActorMaterializer             = ActorMaterializer()
   private implicit def executionContext: ExecutionContext = system.dispatcher
   private val amzDateFormat                               = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmssX")
 

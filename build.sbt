@@ -25,7 +25,7 @@ lazy val root = (project in file("."))
     scalacOptions in IntegrationTest := (scalacOptions in Compile).value.filterNot(_ == "-Ywarn-dead-code")
   )
 
-val akkaVersion     = "2.5.31"
+val akkaVersion     = "2.6.4"
 val akkaHttpVersion = "10.1.11"
 
 lazy val akkaDependencies = Seq(
@@ -44,7 +44,7 @@ lazy val awsDependencies = Seq(
 lazy val testDependencies = Seq(
   "org.scalatest"   %% "scalatest"       % "3.1.1"  % Test,
   "org.mockito"     %% "mockito-scala"   % "1.13.9" % Test,
-  "org.mock-server" % "mockserver-netty" % "5.10.0"  % Test
+  "org.mock-server" % "mockserver-netty" % "5.10.0" % Test
 )
 
 lazy val loggingDependencies = Seq(

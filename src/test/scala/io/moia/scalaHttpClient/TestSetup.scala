@@ -4,7 +4,6 @@ import java.time.Clock
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.{HttpMethod, HttpResponse, Uri}
-import akka.stream.ActorMaterializer
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 
@@ -12,7 +11,6 @@ import scala.concurrent.ExecutionContext
 
 trait TestSetup extends AnyWordSpecLike with Matchers with FutureValues {
   implicit val system: ActorSystem                = ActorSystem("test")
-  implicit val mat: ActorMaterializer             = ActorMaterializer()
   implicit val executionContext: ExecutionContext = system.dispatcher
 
   val clock: Clock = Clock.systemUTC()

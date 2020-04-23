@@ -6,7 +6,6 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.{`Retry-After`, RetryAfterDateTime, RetryAfterDuration}
-import akka.stream.ActorMaterializer
 import com.typesafe.scalalogging.{Logger, LoggerTakingImplicit}
 import org.slf4j.LoggerFactory
 
@@ -128,10 +127,8 @@ abstract class HttpLayer[LoggingContext](
     case other                                                                   => Future.successful(HttpClientError(other))
   }
 
-  private[this] def strictify(response: HttpResponse)(implicit ec: ExecutionContext): Future[HttpResponse] = {
-    implicit val materializer: ActorMaterializer = ActorMaterializer()
+  private[this] def strictify(response: HttpResponse)(implicit ec: ExecutionContext): Future[HttpResponse] =
     response.toStrict(retryConfig.strictifyResponseTimeout)
-  }
 
   private[this] def retryCount(statusCode: StatusCode)(implicit ctx: LoggingContext): Int = statusCode match {
     case StatusCodes.RequestTimeout      => retryConfig.retriesRequestTimeout
