@@ -5,7 +5,6 @@ import java.time.Clock
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.{Unmarshal, Unmarshaller}
-import akka.stream.ActorMaterializer
 import io.moia.scalaHttpClient.ExampleModel.{DomainErrorObject, GatewayException, MySuccessObject}
 
 import scala.concurrent.duration._
@@ -21,7 +20,6 @@ object SimpleExample {
 
   implicit val system: ActorSystem                                = ActorSystem("test")
   implicit val executionContext: ExecutionContext                 = system.dispatcher
-  implicit val mat: ActorMaterializer                             = ActorMaterializer()
   implicit val um1: Unmarshaller[HttpResponse, MySuccessObject]   = ???
   implicit val um2: Unmarshaller[HttpResponse, DomainErrorObject] = ???
 
