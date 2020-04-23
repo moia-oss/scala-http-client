@@ -2,7 +2,6 @@ lazy val root = (project in file("."))
   .settings(
     name := "scala-http-client",
     organization := "io.moia",
-    version := "1.3.1",
     licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0")),
     scmInfo := Some(ScmInfo(url("https://github.com/moia-dev/scala-http-client"), "scm:git@github.com:moia-dev/scala-http-client.git")),
     homepage := Some(url("https://github.com/moia-dev/scala-http-client")),
@@ -23,6 +22,11 @@ lazy val root = (project in file("."))
     scalafmtOnCompile := true,
     Defaults.itSettings,
     scalacOptions in IntegrationTest := (scalacOptions in Compile).value.filterNot(_ == "-Ywarn-dead-code")
+  )
+  .settings(sbtGitSettings)
+  .enablePlugins(
+    GitVersioning,
+    GitBranchPrompt
   )
 
 val akkaVersion     = "2.6.4"
@@ -93,3 +97,17 @@ lazy val sonatypeSettings = {
     credentials += Credentials(Path.userHome / ".sbt" / "sonatype_credential")
   )
 }
+
+lazy val sbtVersionRegex = "v([0-9]+.[0-9]+.[0-9]+)-?(.*)?".r
+
+lazy val sbtGitSettings = Seq(
+  git.useGitDescribe := true,
+  git.baseVersion := "0.0.0",
+  git.uncommittedSignifier := None,
+  git.gitTagToVersionNumber := {
+    case sbtVersionRegex(v, "")         => Some(v)
+    case sbtVersionRegex(v, "SNAPSHOT") => Some(s"$v-SNAPSHOT")
+    case sbtVersionRegex(v, s)          => Some(s"$v-$s-SNAPSHOT")
+    case _                              => None
+  }
+)
