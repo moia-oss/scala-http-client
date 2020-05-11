@@ -15,10 +15,11 @@ class AwsRequestSignerTest extends AnyWordSpecLike with Matchers with FutureValu
 
   classOf[AwsRequestSigner].getSimpleName should {
     "sign http requests" in {
-      def dateHeader: HttpHeader = HttpHeader.parse("X-Amz-Date", "20150830T123600Z") match {
-        case Ok(header, _) => header
-        case unexpected    => sys.error(s"Unexpected HTTP header parse result: $unexpected")
-      }
+      def dateHeader: HttpHeader =
+        HttpHeader.parse("X-Amz-Date", "20150830T123600Z") match {
+          case Ok(header, _) => header
+          case unexpected    => sys.error(s"Unexpected HTTP header parse result: $unexpected")
+        }
 
       val unsignedRequest: HttpRequest = HttpRequest(headers = List(dateHeader), uri = Uri(s"https://www.moia.io"))
 

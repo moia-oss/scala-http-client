@@ -26,9 +26,9 @@ class LoggingHttpClientTest extends TestSetup {
       s"$originalMsg for (${ctx.context})"
     }
     override def afterLog(ctx: LoggingContext): Unit =
-      if (prevContext != null) {
+      if (prevContext != null)
         MDC.put("context", prevContext)
-      } else MDC.remove("context")
+      else MDC.remove("context")
   }
 
   private val theLogger: LoggerTakingImplicit[LoggingContext] = Logger.takingImplicit(LoggerFactory.getLogger(getClass.getName))
