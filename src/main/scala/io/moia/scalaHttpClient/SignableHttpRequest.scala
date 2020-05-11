@@ -28,10 +28,11 @@ final class SignableHttpRequest(request: HttpRequest)(implicit mat: Materializer
 
   private val currentRequest: AtomicReference[HttpRequest] = new AtomicReference(request)
 
-  override def addHeader(name: String, value: String): Unit = HttpHeader.parse(name, value) match {
-    case ParsingResult.Ok(header, _)    => updateRequest(_.addHeader(header))
-    case ParsingResult.Error(errorInfo) => throw UnparsableHeaderException(s"Header parse error: ${errorInfo.formatPretty}")
-  }
+  override def addHeader(name: String, value: String): Unit =
+    HttpHeader.parse(name, value) match {
+      case ParsingResult.Ok(header, _)    => updateRequest(_.addHeader(header))
+      case ParsingResult.Error(errorInfo) => throw UnparsableHeaderException(s"Header parse error: ${errorInfo.formatPretty}")
+    }
 
   override def addParameter(name: String, value: String): Unit =
     updateRequest { request =>
@@ -40,9 +41,10 @@ final class SignableHttpRequest(request: HttpRequest)(implicit mat: Materializer
       request.withUri(uri.withQuery((name -> value) +: query))
     }
 
-  override def setContent(content: InputStream): Unit = updateRequest {
-    _.mapEntity(entity => HttpEntity(entity.contentType, StreamConverters.fromInputStream(() => content)))
-  }
+  override def setContent(content: InputStream): Unit =
+    updateRequest {
+      _.mapEntity(entity => HttpEntity(entity.contentType, StreamConverters.fromInputStream(() => content)))
+    }
 
   override def getHeaders: util.Map[String, String] = fromRequest(_.headers.map(h => h.name() -> h.value()).toMap.asJava)
 

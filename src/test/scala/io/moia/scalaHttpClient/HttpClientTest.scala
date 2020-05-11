@@ -23,10 +23,11 @@ class HttpClientTest extends TestSetup with Inside with StrictLogging {
       val capturedRequest = Promise[HttpRequest]()
 
       val testHttpClient = new HttpClient(httpClientConfig, "TestGateway", httpMetrics, retryConfig, clock, Some(awsRequestSigner)) {
-        override def sendRequest: HttpRequest => Future[HttpResponse] = (req: HttpRequest) => {
-          capturedRequest.success(req)
-          Future.successful(HttpResponse())
-        }
+        override def sendRequest: HttpRequest => Future[HttpResponse] =
+          (req: HttpRequest) => {
+            capturedRequest.success(req)
+            Future.successful(HttpResponse())
+          }
       }
 
       // when
@@ -56,10 +57,11 @@ class HttpClientTest extends TestSetup with Inside with StrictLogging {
       val capturedRequest = Promise[HttpRequest]()
 
       val testHttpClient = new HttpClient(httpClientConfig, "TestGateway", httpMetrics, retryConfig, clock, None) {
-        override def sendRequest: HttpRequest => Future[HttpResponse] = (req: HttpRequest) => {
-          capturedRequest.success(req)
-          Future.successful(HttpResponse())
-        }
+        override def sendRequest: HttpRequest => Future[HttpResponse] =
+          (req: HttpRequest) => {
+            capturedRequest.success(req)
+            Future.successful(HttpResponse())
+          }
       }
 
       // when
@@ -123,20 +125,20 @@ class HttpClientTest extends TestSetup with Inside with StrictLogging {
       val entity = HttpEntity.apply("Example")
 
       val testHttpClient = new HttpClient(httpClientConfig, "TestGateway", httpMetrics, retryConfig, clock, None) {
-        override def sendRequest: HttpRequest => Future[HttpResponse] = (req: HttpRequest) => {
-          if (!capturedRequest1.isCompleted) {
-            capturedRequest1.success(req)
-            throw new Exception("First Exception")
-          } else if (!capturedRequest2.isCompleted) {
-            capturedRequest2.success(req)
-            throw new Exception("Second Exception")
-          } else if (!capturedRequest3.isCompleted) {
-            capturedRequest3.success(req)
-            Future.successful(HttpResponse())
-          } else {
-            fail("More than three requests")
+        override def sendRequest: HttpRequest => Future[HttpResponse] =
+          (req: HttpRequest) => {
+            if (!capturedRequest1.isCompleted) {
+              capturedRequest1.success(req)
+              throw new Exception("First Exception")
+            } else if (!capturedRequest2.isCompleted) {
+              capturedRequest2.success(req)
+              throw new Exception("Second Exception")
+            } else if (!capturedRequest3.isCompleted) {
+              capturedRequest3.success(req)
+              Future.successful(HttpResponse())
+            } else
+              fail("More than three requests")
           }
-        }
       }
 
       // when

@@ -21,8 +21,8 @@ class HttpClient(
     retryConfig: RetryConfig,
     clock: Clock,
     awsRequestSigner: Option[AwsRequestSigner]
-)(
-    implicit system: ActorSystem
+)(implicit
+    system: ActorSystem
 ) extends LoggingHttpClient[NoLoggingContext](
       config,
       name,
@@ -64,8 +64,8 @@ abstract class HttpLayer[LoggingContext](
     clock: Clock,
     logger: LoggerTakingImplicit[LoggingContext],
     awsRequestSigner: Option[AwsRequestSigner] = None
-)(
-    implicit system: ActorSystem
+)(implicit
+    system: ActorSystem
 ) {
   protected def sendRequest: HttpRequest => Future[HttpResponse]
 
@@ -76,15 +76,14 @@ abstract class HttpLayer[LoggingContext](
       headers: Seq[HttpHeader],
       deadline: Deadline,
       queryString: Option[String] = None
-  )(
-      implicit executionContext: ExecutionContext,
+  )(implicit
+      executionContext: ExecutionContext,
       ctx: LoggingContext
   ): Future[HttpClientResponse] =
-    if (deadline.isOverdue()) {
+    if (deadline.isOverdue())
       Future.successful(DeadlineExpired())
-    } else {
+    else
       buildRequest(method, entity, path, headers, queryString).flatMap(executeRequest(_, 1, deadline))
-    }
 
   private[this] def buildRequest(
       method: HttpMethod,
@@ -102,8 +101,8 @@ abstract class HttpLayer[LoggingContext](
     }
   }
 
-  private[this] def executeRequest(request: HttpRequest, tryNumber: Int, deadline: Deadline)(
-      implicit ec: ExecutionContext,
+  private[this] def executeRequest(request: HttpRequest, tryNumber: Int, deadline: Deadline)(implicit
+      ec: ExecutionContext,
       ctx: LoggingContext
   ): Future[HttpClientResponse] =
     Future
@@ -118,31 +117,33 @@ abstract class HttpLayer[LoggingContext](
 
   private[this] def handleResponse(tryNumber: Int, deadline: Deadline, httpRequest: HttpRequest)(
       response: HttpResponse
-  )(implicit ec: ExecutionContext, ctx: LoggingContext): Future[HttpClientResponse] = response match {
-    case response @ HttpResponse(StatusCodes.Success(_), _, _, _)                => Future.successful(HttpClientSuccess(response))
-    case response @ HttpResponse(StatusCodes.BadRequest, _, HttpEntity.Empty, _) => Future.successful(HttpClientError(response))
-    case response @ HttpResponse(StatusCodes.BadRequest, _, _, _)                => Future.successful(DomainError(response))
-    case response @ HttpResponse(StatusCodes.ClientError(_), _, _, _)            => retryWithConfig(tryNumber, httpRequest, response, deadline)
-    case response @ HttpResponse(StatusCodes.ServerError(_), _, _, _)            => retryWithConfig(tryNumber, httpRequest, response, deadline)
-    case other                                                                   => Future.successful(HttpClientError(other))
-  }
+  )(implicit ec: ExecutionContext, ctx: LoggingContext): Future[HttpClientResponse] =
+    response match {
+      case response @ HttpResponse(StatusCodes.Success(_), _, _, _)                => Future.successful(HttpClientSuccess(response))
+      case response @ HttpResponse(StatusCodes.BadRequest, _, HttpEntity.Empty, _) => Future.successful(HttpClientError(response))
+      case response @ HttpResponse(StatusCodes.BadRequest, _, _, _)                => Future.successful(DomainError(response))
+      case response @ HttpResponse(StatusCodes.ClientError(_), _, _, _)            => retryWithConfig(tryNumber, httpRequest, response, deadline)
+      case response @ HttpResponse(StatusCodes.ServerError(_), _, _, _)            => retryWithConfig(tryNumber, httpRequest, response, deadline)
+      case other                                                                   => Future.successful(HttpClientError(other))
+    }
 
   private[this] def strictify(response: HttpResponse)(implicit ec: ExecutionContext): Future[HttpResponse] =
     response.toStrict(retryConfig.strictifyResponseTimeout)
 
-  private[this] def retryCount(statusCode: StatusCode)(implicit ctx: LoggingContext): Int = statusCode match {
-    case StatusCodes.RequestTimeout      => retryConfig.retriesRequestTimeout
-    case StatusCodes.TooManyRequests     => retryConfig.retriesTooManyRequests
-    case StatusCodes.ClientError(_)      => retryConfig.retriesClientError
-    case StatusCodes.InternalServerError => retryConfig.retriesInternalServerError
-    case StatusCodes.BadGateway          => retryConfig.retriesBadGateway
-    case StatusCodes.ServiceUnavailable  => retryConfig.retriesServiceUnavailable
-    case StatusCodes.ServerError(_)      => retryConfig.retriesServerError
-    case code: StatusCode                => logger.debug(s"[$name] Not retrying code ${code.toString}."); 0
-  }
+  private[this] def retryCount(statusCode: StatusCode)(implicit ctx: LoggingContext): Int =
+    statusCode match {
+      case StatusCodes.RequestTimeout      => retryConfig.retriesRequestTimeout
+      case StatusCodes.TooManyRequests     => retryConfig.retriesTooManyRequests
+      case StatusCodes.ClientError(_)      => retryConfig.retriesClientError
+      case StatusCodes.InternalServerError => retryConfig.retriesInternalServerError
+      case StatusCodes.BadGateway          => retryConfig.retriesBadGateway
+      case StatusCodes.ServiceUnavailable  => retryConfig.retriesServiceUnavailable
+      case StatusCodes.ServerError(_)      => retryConfig.retriesServerError
+      case code: StatusCode                => logger.debug(s"[$name] Not retrying code ${code.toString}."); 0
+    }
 
-  private[this] def retryWithConfig(tryNum: Int, request: HttpRequest, response: HttpResponse, deadline: Deadline)(
-      implicit ec: ExecutionContext,
+  private[this] def retryWithConfig(tryNum: Int, request: HttpRequest, response: HttpResponse, deadline: Deadline)(implicit
+      ec: ExecutionContext,
       ctx: LoggingContext
   ): Future[HttpClientResponse] =
     if (deadline.isOverdue()) {
@@ -163,19 +164,20 @@ abstract class HttpLayer[LoggingContext](
       Future.successful(HttpClientError(response))
     }
 
-  private[this] def calculateDelay(retryAfter: Option[`Retry-After`], tryNum: Int): FiniteDuration = retryAfter match {
-    case Some(value) =>
-      value.delaySecondsOrDateTime match {
-        case RetryAfterDuration(delayInSeconds) => delayInSeconds.seconds
-        case RetryAfterDateTime(dateTime)       => (dateTime.clicks - clock.instant().toEpochMilli).millis
-      }
-    case None =>
-      val factor = scala.math.pow(2.0, tryNum.toDouble - 1.0).toLong
-      retryConfig.initialBackoff * factor
-  }
+  private[this] def calculateDelay(retryAfter: Option[`Retry-After`], tryNum: Int): FiniteDuration =
+    retryAfter match {
+      case Some(value) =>
+        value.delaySecondsOrDateTime match {
+          case RetryAfterDuration(delayInSeconds) => delayInSeconds.seconds
+          case RetryAfterDateTime(dateTime)       => (dateTime.clicks - clock.instant().toEpochMilli).millis
+        }
+      case None =>
+        val factor = scala.math.pow(2.0, tryNum.toDouble - 1.0).toLong
+        retryConfig.initialBackoff * factor
+    }
 
-  private[this] def handleErrors(tryNum: Int, deadline: Deadline, request: HttpRequest)(
-      implicit ec: ExecutionContext,
+  private[this] def handleErrors(tryNum: Int, deadline: Deadline, request: HttpRequest)(implicit
+      ec: ExecutionContext,
       ctx: LoggingContext
   ): PartialFunction[Throwable, Future[HttpClientResponse]] = {
     case NonFatal(e) if tryNum <= retryConfig.retriesException =>

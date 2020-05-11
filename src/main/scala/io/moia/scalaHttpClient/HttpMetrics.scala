@@ -7,7 +7,8 @@ trait HttpMetrics[LoggingContext] {
 }
 
 object HttpMetrics {
-  def none[LoggingContext]: HttpMetrics[LoggingContext] = new HttpMetrics[LoggingContext] {
-    override def meterResponse(method: HttpMethod, path: Uri.Path, response: HttpResponse)(implicit ctx: LoggingContext): Unit = ()
-  }
+  def none[LoggingContext]: HttpMetrics[LoggingContext] =
+    new HttpMetrics[LoggingContext] {
+      override def meterResponse(method: HttpMethod, path: Uri.Path, response: HttpResponse)(implicit ctx: LoggingContext): Unit = ()
+    }
 }

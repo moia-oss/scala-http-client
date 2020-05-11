@@ -48,10 +48,11 @@ class SignableHttpRequestTest extends AnyWordSpecLike with Matchers with FutureV
 
     def uri: Uri = Uri(s"https://$host$path$query")
 
-    def dateHeader: HttpHeader = HttpHeader.parse("X-Amz-Date", dateHeaderValue) match {
-      case Ok(header, _) => header
-      case unexpected    => sys.error(s"Unexpected HTTP header parse result: $unexpected")
-    }
+    def dateHeader: HttpHeader =
+      HttpHeader.parse("X-Amz-Date", dateHeaderValue) match {
+        case Ok(header, _) => header
+        case unexpected    => sys.error(s"Unexpected HTTP header parse result: $unexpected")
+      }
     def hostHeader: HttpHeader    = Host(host)
     def headers: List[HttpHeader] = List(dateHeader, hostHeader)
 

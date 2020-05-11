@@ -23,9 +23,8 @@ trait FutureValues extends Assertions {
 
   implicit class WithFutureValue[T](future: Future[T]) {
     def futureValue(implicit awaitDuration: Duration): T =
-      try {
-        Await.result(future, awaitDuration)
-      } catch {
+      try Await.result(future, awaitDuration)
+      catch {
         case _: TimeoutException =>
           fail(s"Future timeout out after $awaitDuration.")
       }
