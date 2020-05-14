@@ -73,10 +73,12 @@ class AwsRequestSigner private (credentialsProvider: AwsCredentialsProvider, reg
   }
 
   private def getSdkHeaders(signedSdkRequest: SdkHttpFullRequest): immutable.Seq[HttpHeader] =
-    signedSdkRequest
-      .headers()
-      .asScala
-      .toSeq
+    immutable.Seq
+      .from(
+        signedSdkRequest
+          .headers()
+          .asScala
+      )
       .map(h => HttpHeader.parse(h._1, h._2.asScala.head))
       .collect {
         case ParsingResult.Ok(header, _) => header
