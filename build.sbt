@@ -6,14 +6,7 @@ lazy val root = (project in file("."))
     scmInfo := Some(ScmInfo(url("https://github.com/moia-dev/scala-http-client"), "scm:git@github.com:moia-dev/scala-http-client.git")),
     homepage := Some(url("https://github.com/moia-dev/scala-http-client")),
     scalaVersion := "2.13.1",
-    crossScalaVersions := List("2.13.1", "2.12.10"),
-    scalacOptions ++= {
-      CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((2, 12)) => scalacOptions_2_12
-        case Some((2, 13)) => scalacOptions_2_13
-        case _             => Seq()
-      }
-    },
+    scalacOptions ++= scalacOptions_2_13,
     libraryDependencies ++= akkaDependencies ++ awsDependencies ++ testDependencies ++ loggingDependencies
   )
   .settings(sonatypeSettings: _*)
@@ -46,8 +39,8 @@ lazy val awsDependencies = Seq(
 )
 
 lazy val testDependencies = Seq(
-  "org.scalatest"   %% "scalatest"       % "3.1.2"  % Test,
-  "org.mockito"     %% "mockito-scala"   % "1.14.2" % Test,
+  "org.scalatest"  %% "scalatest"        % "3.1.2"  % Test,
+  "org.mockito"    %% "mockito-scala"    % "1.14.2" % Test,
   "org.mock-server" % "mockserver-netty" % "5.10.0" % Test
 )
 
@@ -57,23 +50,6 @@ lazy val loggingDependencies = Seq(
 )
 
 scapegoatVersion in ThisBuild := "1.4.1"
-
-lazy val scalacOptions_2_12 = Seq(
-  "-unchecked",
-  "-deprecation",
-  "-language:_",
-  "-target:jvm-1.8",
-  "-encoding",
-  "UTF-8",
-  "-Xfatal-warnings",
-  "-Ywarn-unused-import",
-  "-Yno-adapted-args",
-  "-Ywarn-dead-code",
-  "-Ywarn-inaccessible",
-  "-Ywarn-infer-any",
-  "-Ywarn-nullary-override",
-  "-Ywarn-nullary-unit"
-)
 
 lazy val scalacOptions_2_13 = Seq(
   "-unchecked",
