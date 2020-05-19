@@ -51,9 +51,9 @@ class AwsRequestSigner private (credentialsProvider: AwsCredentialsProvider, reg
       StreamConverters.asInputStream()
     )
     val headers: util.Map[String, util.List[String]] =
-      request.headers.groupBy(_.name).mapValues(h => h.map(_.value)).toMap.map(h => h._1 -> h._2.toList.asJava).asJava
+      request.headers.groupBy(_.name).view.mapValues(h => h.map(_.value)).toMap.map(h => h._1 -> h._2.toList.asJava).asJava
     val query: util.Map[String, util.List[String]] =
-      request.uri.query().groupBy(_._1).mapValues(q => q.map(_._2)).toMap.map(q => q._1 -> q._2.toList.asJava).asJava
+      request.uri.query().groupBy(_._1).view.mapValues(q => q.map(_._2)).toMap.map(q => q._1 -> q._2.toList.asJava).asJava
     SdkHttpFullRequest
       .builder()
       .uri(
