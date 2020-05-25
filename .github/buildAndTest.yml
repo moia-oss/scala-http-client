@@ -1,0 +1,38 @@
+name: Build & Test
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  scalafmt:
+    name: Check formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Scalafmt
+        run: sbt scalafmtCheckAll
+
+  test:
+    name: Compile and Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run tests
+        run: sbt test
+
+  examples:
+    name: Compile Examples
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Compile examples
+        run: sbt +it:compile
+
+  scapegoat:
+    name: Scapegoat
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run scapegoat
+        run: sbt +scapegoat
