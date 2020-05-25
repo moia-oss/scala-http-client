@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Compile examples
-        run: sbt +it:compile
+        run: sbt it:compile
 
   scapegoat:
     name: Scapegoat
@@ -35,4 +35,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run scapegoat
-        run: sbt +scapegoat
+        run: sbt scapegoat
