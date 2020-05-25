@@ -10,11 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Cache Coursier dependencies based on OS version and build.sbt
+      - name: Cache SBT ivy cache
         uses: actions/cache@v1
         with:
-          path: ~/.cache/coursier/
-          key: ${{ runner.os }}-build-${{ hashFiles('build.sbt') }}
+          path: ~/.ivy2/cache
+          key: ${{ runner.os }}-sbt-ivy-cache-${{ hashFiles('**/build.sbt') }}
+      - name: Cache SBT
+        uses: actions/cache@v1
+        with:
+          path: ~/.sbt
+          key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
       - name: Scalafmt
         run: sbt scalafmtCheckAll
 
@@ -23,11 +28,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Cache Coursier dependencies based on OS version and build.sbt
+      - name: Cache SBT ivy cache
         uses: actions/cache@v1
         with:
-          path: ~/.cache/coursier/
-          key: ${{ runner.os }}-build-${{ hashFiles('build.sbt') }}
+          path: ~/.ivy2/cache
+          key: ${{ runner.os }}-sbt-ivy-cache-${{ hashFiles('**/build.sbt') }}
+      - name: Cache SBT
+        uses: actions/cache@v1
+        with:
+          path: ~/.sbt
+          key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
       - name: Run tests
         run: sbt test
 
@@ -36,11 +46,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Cache Coursier dependencies based on OS version and build.sbt
+      - name: Cache SBT ivy cache
         uses: actions/cache@v1
         with:
-          path: ~/.cache/coursier/
-          key: ${{ runner.os }}-build-${{ hashFiles('build.sbt') }}
+          path: ~/.ivy2/cache
+          key: ${{ runner.os }}-sbt-ivy-cache-${{ hashFiles('**/build.sbt') }}
+      - name: Cache SBT
+        uses: actions/cache@v1
+        with:
+          path: ~/.sbt
+          key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
       - name: Compile examples
         run: sbt it:compile
 
@@ -49,10 +64,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Cache Coursier dependencies based on OS version and build.sbt
+      - name: Cache SBT ivy cache
         uses: actions/cache@v1
         with:
-          path: ~/.cache/coursier/
-          key: ${{ runner.os }}-build-${{ hashFiles('build.sbt') }}
+          path: ~/.ivy2/cache
+          key: ${{ runner.os }}-sbt-ivy-cache-${{ hashFiles('**/build.sbt') }}
+      - name: Cache SBT
+        uses: actions/cache@v1
+        with:
+          path: ~/.sbt
+          key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
       - name: Run scapegoat
         run: sbt scapegoat
