@@ -6,7 +6,14 @@ lazy val root = (project in file("."))
     scmInfo := Some(ScmInfo(url("https://github.com/moia-dev/scala-http-client"), "scm:git@github.com:moia-dev/scala-http-client.git")),
     homepage := Some(url("https://github.com/moia-dev/scala-http-client")),
     scalaVersion := "2.13.1",
-    scalacOptions ++= scalacOptions_2_13,
+    crossScalaVersions := List("2.13.1", "2.12.10"),
+    scalacOptions ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, 12)) => scalacOptions_2_12
+        case Some((2, 13)) => scalacOptions_2_13
+        case _             => Seq()
+      }
+    },
     libraryDependencies ++= akkaDependencies ++ awsDependencies ++ testDependencies ++ loggingDependencies
   )
   .settings(sonatypeSettings: _*)
@@ -50,6 +57,23 @@ lazy val loggingDependencies = Seq(
 )
 
 scapegoatVersion in ThisBuild := "1.4.1"
+
+lazy val scalacOptions_2_12 = Seq(
+  "-unchecked",
+  "-deprecation",
+  "-language:_",
+  "-target:jvm-1.8",
+  "-encoding",
+  "UTF-8",
+  "-Xfatal-warnings",
+  "-Ywarn-unused-import",
+  "-Yno-adapted-args",
+  "-Ywarn-dead-code",
+  "-Ywarn-inaccessible",
+  "-Ywarn-infer-any",
+  "-Ywarn-nullary-override",
+  "-Ywarn-nullary-unit"
+)
 
 lazy val scalacOptions_2_13 = Seq(
   "-unchecked",
