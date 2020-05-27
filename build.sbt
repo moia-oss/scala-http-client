@@ -14,7 +14,7 @@ lazy val root = (project in file("."))
         case _             => Seq()
       }
     },
-    libraryDependencies ++= akkaDependencies ++ awsDependencies ++ testDependencies ++ loggingDependencies
+    libraryDependencies ++= akkaDependencies ++ awsDependencies ++ testDependencies ++ loggingDependencies ++ scalaDependencies
   )
   .settings(sonatypeSettings: _*)
   .configs(IntegrationTest)
@@ -54,6 +54,10 @@ lazy val testDependencies = Seq(
 lazy val loggingDependencies = Seq(
   "com.typesafe.scala-logging" %% "scala-logging"   % "3.9.2",
   "ch.qos.logback"              % "logback-classic" % "1.2.3" % Test
+)
+
+lazy val scalaDependencies = Seq(
+  "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.6"
 )
 
 scapegoatVersion in ThisBuild := "1.4.1"

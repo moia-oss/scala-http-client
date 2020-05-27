@@ -17,6 +17,8 @@ import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.sts.auth.StsAssumeRoleCredentialsProvider
 import software.amazon.awssdk.services.sts.model.AssumeRoleRequest
 
+import scala.collection.compat._
+import scala.collection.immutable._
 import scala.concurrent.{blocking, Future}
 import scala.jdk.CollectionConverters._
 
@@ -50,9 +52,9 @@ class AwsRequestSigner private (credentialsProvider: AwsCredentialsProvider, reg
       StreamConverters.asInputStream()
     )
     val headers: util.Map[String, util.List[String]] =
-      request.headers.groupMap(_.name)(_.value).map(h => h._1 -> h._2.toList.asJava).asJava
+      request.headers.groupBy(_.name).view.mapValues(_.map(_.value)).map(h => h._1 -> h._2.toList.asJava).toMap.asJava
     val query: util.Map[String, util.List[String]] =
-      request.uri.query().groupMap(_._1)(_._2).map(q => q._1 -> q._2.toList.asJava).asJava
+      request.uri.query().groupBy(_._1).view.mapValues(_.map(_._2)).map(q => q._1 -> q._2.toList.asJava).toMap.asJava
     SdkHttpFullRequest
       .builder()
       .uri(
@@ -71,7 +73,7 @@ class AwsRequestSigner private (credentialsProvider: AwsCredentialsProvider, reg
       .build()
   }
 
-  private def getSdkHeaders(signedSdkRequest: SdkHttpFullRequest): Seq[HttpHeader] =
+  private def getSdkHeaders(signedSdkRequest: SdkHttpFullRequest): scala.collection.immutable.Seq[HttpHeader] =
     signedSdkRequest
       .headers()
       .asScala
@@ -80,6 +82,7 @@ class AwsRequestSigner private (credentialsProvider: AwsCredentialsProvider, reg
       .collect {
         case ParsingResult.Ok(header, _) => header
       }
+      .to(Seq)
 }
 
 object AwsRequestSigner extends StrictLogging {
