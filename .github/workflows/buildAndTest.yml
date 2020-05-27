@@ -30,7 +30,7 @@ jobs:
             ~/.sbt
           key: ${{ runner.os }}-sbt-ivy-cache-${{ hashFiles('**/build.sbt') }}-${{ hashFiles('**/plugins.sbt') }}-${{ hashFiles('**/build.properties') }}
       - name: Compile
-        run: sbt compile
+        run: sbt +compile
 
   test:
     name: Test
