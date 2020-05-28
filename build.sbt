@@ -14,7 +14,7 @@ lazy val root = (project in file("."))
         case _             => Seq()
       }
     },
-    libraryDependencies ++= akkaDependencies ++ awsDependencies ++ testDependencies ++ loggingDependencies
+    libraryDependencies ++= akkaDependencies ++ awsDependencies ++ testDependencies ++ loggingDependencies ++ scalaDependencies
   )
   .settings(sonatypeSettings: _*)
   .configs(IntegrationTest)
@@ -35,14 +35,14 @@ val akkaHttpVersion = "10.1.12"
 lazy val akkaDependencies = Seq(
   "com.typesafe.akka" %% "akka-stream"       % akkaVersion,
   "com.typesafe.akka" %% "akka-http"         % akkaHttpVersion,
-  "com.typesafe.akka" %% "akka-testkit"      % akkaVersion % Test,
+  "com.typesafe.akka" %% "akka-testkit"      % akkaVersion     % Test,
   "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion % Test
 )
 
-lazy val awsJavaSdkVersion = "1.11.789"
+lazy val awsJavaSdkVersion = "2.13.8"
 lazy val awsDependencies = Seq(
-  "com.amazonaws" % "aws-java-sdk-core" % awsJavaSdkVersion,
-  "com.amazonaws" % "aws-java-sdk-sts"  % awsJavaSdkVersion
+  "software.amazon.awssdk" % "core" % awsJavaSdkVersion,
+  "software.amazon.awssdk" % "sts"  % awsJavaSdkVersion
 )
 
 lazy val testDependencies = Seq(
@@ -52,8 +52,12 @@ lazy val testDependencies = Seq(
 )
 
 lazy val loggingDependencies = Seq(
-  "com.typesafe.scala-logging" %% "scala-logging"  % "3.9.2",
-  "ch.qos.logback"             % "logback-classic" % "1.2.3" % Test
+  "com.typesafe.scala-logging" %% "scala-logging"   % "3.9.2",
+  "ch.qos.logback"              % "logback-classic" % "1.2.3" % Test
+)
+
+lazy val scalaDependencies = Seq(
+  "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.6"
 )
 
 scapegoatVersion in ThisBuild := "1.4.1"
