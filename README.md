@@ -9,13 +9,13 @@ This is a wrapper around the akka-http-client that adds
 * logging
 * AWS request signing
 
-[![CircleCI](https://circleci.com/gh/moia-dev/scala-http-client/tree/master.svg?style=svg)](https://circleci.com/gh/moia-dev/scala-http-client/tree/master)
+![Build & Test](https://github.com/moia-dev/scala-http-client/workflows/Build%20&%20Test/badge.svg)
 [![Scala 2.13](https://img.shields.io/maven-central/v/io.moia/scala-http-client_2.13.svg)](https://search.maven.org/search?q=scala-http-client_2.13)
 
 ## Usage
 
 ```sbt
-libraryDependencies += "io.moia" %% "scala-http-client" % "1.3.0"
+libraryDependencies += "io.moia" %% "scala-http-client" % "2.1.0"
 ```
 
 ```scala
