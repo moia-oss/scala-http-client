@@ -14,6 +14,7 @@ import software.amazon.awssdk.auth.signer.{Aws4Signer, AwsSignerExecutionAttribu
 import software.amazon.awssdk.core.interceptor.ExecutionAttributes
 import software.amazon.awssdk.http.{SdkHttpFullRequest, SdkHttpMethod}
 import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.sts.StsClient
 import software.amazon.awssdk.services.sts.auth.StsAssumeRoleCredentialsProvider
 import software.amazon.awssdk.services.sts.model.AssumeRoleRequest
 
@@ -103,6 +104,7 @@ object AwsRequestSigner extends StrictLogging {
         logger.info(s"Assuming role from config $config.")
         val provider: StsAssumeRoleCredentialsProvider = StsAssumeRoleCredentialsProvider
           .builder()
+          .stsClient(StsClient.create())
           .refreshRequest(
             AssumeRoleRequest.builder().roleArn(roleArn).roleSessionName(roleSessionName).build()
           )
