@@ -9,6 +9,7 @@ import akka.http.scaladsl.model.{HttpHeader, HttpRequest, Uri}
 import akka.stream.Materializer
 import akka.stream.scaladsl.StreamConverters
 import com.typesafe.scalalogging.StrictLogging
+import io.moia.scalaHttpClient.AwsRequestSigner.AlreadyAuthorized
 import software.amazon.awssdk.auth.credentials._
 import software.amazon.awssdk.auth.signer.{Aws4Signer, AwsSignerExecutionAttribute}
 import software.amazon.awssdk.core.interceptor.ExecutionAttributes
@@ -32,15 +33,35 @@ class AwsRequestSigner private (credentialsProvider: AwsCredentialsProvider, reg
     .putAttribute(AwsSignerExecutionAttribute.SERVICE_SIGNING_NAME, "execute-api")
     .putAttribute(AwsSignerExecutionAttribute.SIGNING_REGION, Region.of(region))
 
+  /**
+    * Signs the given HttpRequest
+    *
+    * @param request `HttpRequest` to be signed
+    * @return `Future[HttpRequest]` the signed `HttpRequest`
+    * @throws AlreadyAuthorized if the given `HttpRequest` already includes an "Authorize" header
+    */
   def signRequest(request: HttpRequest): Future[HttpRequest] =
-    Future {
-      val sdkRequest = toSdkRequest(request)
-      val signedSdkRequest = blocking {
-        awsSigner.sign(sdkRequest, executionAttributes)
-      }
-      // construct new HttpRequest with signed URI query params and headers
-      HttpRequest(request.method, uri = Uri(signedSdkRequest.getUri.toString), getSdkHeaders(signedSdkRequest), request.entity)
-    }(mat.executionContext)
+    if (isAlreadyAuthorized(request.headers))
+      Future.failed(AlreadyAuthorized())
+    else
+      Future {
+        val sdkRequest = toSdkRequest(request)
+        val signedSdkRequest = blocking {
+          awsSigner.sign(sdkRequest, executionAttributes)
+        }
+        // construct new HttpRequest with signed URI query params and headers
+        HttpRequest(request.method, uri = Uri(signedSdkRequest.getUri.toString), getSdkHeaders(signedSdkRequest), request.entity)
+      }(mat.executionContext)
+
+  /**
+    * Checks if the given collection of `HttpHeader`s includes one "Authorization" header
+    * @param headers `Seq[HttpHeader]` headers of an Akka `HttpRequest`
+    * @return true if "Authorization" header exists
+    */
+  private def isAlreadyAuthorized(headers: Seq[HttpHeader]): Boolean =
+    headers.exists { header: HttpHeader =>
+      header.is("authorization")
+    }
 
   /**
     * Constructs an `SdkHttpFullRequest` from Akka's `HttpRequest` for signing.
@@ -74,6 +95,12 @@ class AwsRequestSigner private (credentialsProvider: AwsCredentialsProvider, reg
       .build()
   }
 
+  /**
+    * Extracts the headers from the `SdkHttpFullRequest` as collection of Akka's `HttpHeader`s
+    *
+    * @param signedSdkRequest `SdkHttpFullRequest` after signing
+    * @return `Seq[HttpHeader]` of the signedSdkRequest
+    */
   private def getSdkHeaders(signedSdkRequest: SdkHttpFullRequest): scala.collection.immutable.Seq[HttpHeader] =
     signedSdkRequest
       .headers()
@@ -95,6 +122,18 @@ object AwsRequestSigner extends StrictLogging {
     final case class Instance(awsRegion: String) extends AwsRequestSignerConfig
   }
 
+  /** Being throw when the request to be signed already includes an "Authorization" header */
+  final case class AlreadyAuthorized(
+      private val message: String = "The given request already includes an `Authorization` header. Won't sign again."
+  ) extends Exception(message)
+
+  /**
+    * Construct an `AwsRequestSigner` from the given configuration.
+    *
+    * @param config `AwsRequestSignerConfig` to be used to construct one of the three config providers
+    * @param mat `Materializer` on which the `Future`s run
+    * @return `AwsRequestSigner`
+    */
   def fromConfig(config: AwsRequestSignerConfig)(implicit mat: Materializer): AwsRequestSigner =
     config match {
       case AwsRequestSignerConfig.Instance(awsRegion) =>
