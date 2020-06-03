@@ -23,11 +23,10 @@ class HttpClientTest extends TestSetup with Inside with StrictLogging {
       val capturedRequest = Promise[HttpRequest]()
 
       val testHttpClient = new HttpClient(httpClientConfig, "TestGateway", httpMetrics, retryConfig, clock, Some(awsRequestSigner)) {
-        override def sendRequest: HttpRequest => Future[HttpResponse] =
-          (req: HttpRequest) => {
-            capturedRequest.success(req)
-            Future.successful(HttpResponse())
-          }
+        override def sendRequest(req: HttpRequest): Future[HttpResponse] = {
+          capturedRequest.success(req)
+          Future.successful(HttpResponse())
+        }
       }
 
       // when
@@ -57,11 +56,10 @@ class HttpClientTest extends TestSetup with Inside with StrictLogging {
       val capturedRequest = Promise[HttpRequest]()
 
       val testHttpClient = new HttpClient(httpClientConfig, "TestGateway", httpMetrics, retryConfig, clock, None) {
-        override def sendRequest: HttpRequest => Future[HttpResponse] =
-          (req: HttpRequest) => {
-            capturedRequest.success(req)
-            Future.successful(HttpResponse())
-          }
+        override def sendRequest(req: HttpRequest): Future[HttpResponse] = {
+          capturedRequest.success(req)
+          Future.successful(HttpResponse())
+        }
       }
 
       // when
@@ -87,8 +85,8 @@ class HttpClientTest extends TestSetup with Inside with StrictLogging {
     "return an HttpClientError on StatusCode 400 without an Entity" in {
 
       val testHttpClient = new HttpClient(httpClientConfig, "TestGateway", httpMetrics, retryConfig, clock, None) {
-        override def sendRequest: HttpRequest => Future[HttpResponse] =
-          _ => Future.successful(HttpResponse().withStatus(400).withEntity(HttpEntity.Empty))
+        override def sendRequest(req: HttpRequest): Future[HttpResponse] =
+          Future.successful(HttpResponse().withStatus(400).withEntity(HttpEntity.Empty))
       }
 
       // When
@@ -102,8 +100,8 @@ class HttpClientTest extends TestSetup with Inside with StrictLogging {
     "return a DomainError on StatusCode 400 with an Entity" in {
 
       val testHttpClient = new HttpClient(httpClientConfig, "TestGateway", httpMetrics, retryConfig, clock, None) {
-        override def sendRequest: HttpRequest => Future[HttpResponse] =
-          _ => Future.successful(HttpResponse().withStatus(400).withEntity(HttpEntity("Test")))
+        override def sendRequest(req: HttpRequest): Future[HttpResponse] =
+          Future.successful(HttpResponse().withStatus(400).withEntity(HttpEntity("Test")))
       }
 
       // When
@@ -125,20 +123,18 @@ class HttpClientTest extends TestSetup with Inside with StrictLogging {
       val entity = HttpEntity.apply("Example")
 
       val testHttpClient = new HttpClient(httpClientConfig, "TestGateway", httpMetrics, retryConfig, clock, None) {
-        override def sendRequest: HttpRequest => Future[HttpResponse] =
-          (req: HttpRequest) => {
-            if (!capturedRequest1.isCompleted) {
-              capturedRequest1.success(req)
-              throw new Exception("First Exception")
-            } else if (!capturedRequest2.isCompleted) {
-              capturedRequest2.success(req)
-              throw new Exception("Second Exception")
-            } else if (!capturedRequest3.isCompleted) {
-              capturedRequest3.success(req)
-              Future.successful(HttpResponse())
-            } else
-              fail("More than three requests")
-          }
+        override def sendRequest(req: HttpRequest): Future[HttpResponse] =
+          if (!capturedRequest1.isCompleted) {
+            capturedRequest1.success(req)
+            throw new Exception("First Exception")
+          } else if (!capturedRequest2.isCompleted) {
+            capturedRequest2.success(req)
+            throw new Exception("Second Exception")
+          } else if (!capturedRequest3.isCompleted) {
+            capturedRequest3.success(req)
+            Future.successful(HttpResponse())
+          } else
+            fail("More than three requests")
       }
 
       // when
@@ -154,6 +150,6 @@ class HttpClientTest extends TestSetup with Inside with StrictLogging {
 
   private[this] def dummyRequestWithFixResponseStatus(status: StatusCode): HttpClientResponse =
     new HttpClient(httpClientConfig, "TestGateway", httpMetrics, retryConfig, clock, None) {
-      override def sendRequest: HttpRequest => Future[HttpResponse] = _ => Future.successful(HttpResponse(status))
+      override def sendRequest(req: HttpRequest): Future[HttpResponse] = Future.successful(HttpResponse(status))
     }.request(HttpMethods.POST, HttpEntity.Empty, "/test", immutable.Seq.empty, Deadline.now + 10.seconds).futureValue
 }
