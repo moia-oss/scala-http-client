@@ -9,7 +9,7 @@ import akka.http.scaladsl.model.{HttpHeader, HttpRequest, Uri}
 import akka.stream.Materializer
 import akka.stream.scaladsl.StreamConverters
 import com.typesafe.scalalogging.StrictLogging
-import io.moia.scalaHttpClient.AwsRequestSigner.AlreadyAuthorized
+import io.moia.scalaHttpClient.AwsRequestSigner.AlreadyAuthorizedException
 import software.amazon.awssdk.auth.credentials._
 import software.amazon.awssdk.auth.signer.{Aws4Signer, AwsSignerExecutionAttribute}
 import software.amazon.awssdk.core.interceptor.ExecutionAttributes
@@ -38,11 +38,11 @@ class AwsRequestSigner private (credentialsProvider: AwsCredentialsProvider, reg
     *
     * @param request `HttpRequest` to be signed
     * @return `Future[HttpRequest]` the signed `HttpRequest`
-    * @throws AlreadyAuthorized if the given `HttpRequest` already includes an "Authorize" header
+    * @throws AlreadyAuthorizedException if the given `HttpRequest` already includes an "Authorize" header
     */
   def signRequest(request: HttpRequest): Future[HttpRequest] =
     if (isAlreadyAuthorized(request.headers))
-      Future.failed(AlreadyAuthorized())
+      Future.failed(AlreadyAuthorizedException())
     else
       Future {
         val sdkRequest = toSdkRequest(request)
@@ -123,7 +123,7 @@ object AwsRequestSigner extends StrictLogging {
   }
 
   /** Being throw when the request to be signed already includes an "Authorization" header */
-  final case class AlreadyAuthorized(
+  final case class AlreadyAuthorizedException(
       private val message: String = "The given request already includes an `Authorization` header. Won't sign again."
   ) extends Exception(message)
 
