@@ -9,7 +9,6 @@ import akka.http.scaladsl.model.{HttpHeader, HttpRequest, Uri}
 import akka.stream.Materializer
 import akka.stream.scaladsl.StreamConverters
 import com.typesafe.scalalogging.StrictLogging
-import io.moia.scalaHttpClient.AwsRequestSigner.AlreadyAuthorizedException
 import software.amazon.awssdk.auth.credentials._
 import software.amazon.awssdk.auth.signer.{Aws4Signer, AwsSignerExecutionAttribute}
 import software.amazon.awssdk.core.interceptor.ExecutionAttributes
@@ -124,11 +123,6 @@ object AwsRequestSigner extends StrictLogging {
     final case class Instance(awsRegion: String) extends AwsRequestSignerConfig
   }
 
-  /** Being throw when the request to be signed already includes an "Authorization" header */
-  final case class AlreadyAuthorizedException(
-      private val message: String = "The given request already includes an `Authorization` header. Won't sign again."
-  ) extends Exception(message)
-
   /**
     * Construct an `AwsRequestSigner` from the given configuration.
     *
@@ -157,3 +151,8 @@ object AwsRequestSigner extends StrictLogging {
         new AwsRequestSigner(provider, awsRegion)
     }
 }
+
+/** Being throw when the request to be signed already includes an "Authorization" header */
+final case class AlreadyAuthorizedException(
+    private val message: String = "The given request already includes an `Authorization` header. Won't sign again."
+) extends Exception(message)
