@@ -3,7 +3,7 @@ package io.moia.scalaHttpClient
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.model.{HttpRequest, Uri}
-import io.moia.scalaHttpClient.AwsRequestSigner.{AlreadyAuthorizedException, AwsRequestSignerConfig}
+import io.moia.scalaHttpClient.AwsRequestSigner.AwsRequestSignerConfig
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 
