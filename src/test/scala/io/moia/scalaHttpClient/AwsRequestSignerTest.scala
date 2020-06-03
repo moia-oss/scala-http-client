@@ -49,7 +49,7 @@ class AwsRequestSignerTest extends AnyWordSpecLike with Matchers with FutureValu
     "add the correct headers to a GET request with some header" in {
       // Name in AWS test data: get-vanilla-query-order
       val unsignedRequest: HttpRequest =
-        HttpRequest(uri = Uri(s"https://www.moia.io/"), headers = Seq(RawHeader("someHeader", "123")))
+        HttpRequest(uri = Uri(s"https://www.moia.io/"), headers = scala.collection.immutable.Seq(RawHeader("someHeader", "123")))
 
       val result: HttpRequest = underTest.signRequest(unsignedRequest).futureValue
       // the difference to the test before is that not only the additional header is present
@@ -69,7 +69,8 @@ class AwsRequestSignerTest extends AnyWordSpecLike with Matchers with FutureValu
 
     "fail a GET request with an already existing Authorization header" in {
       // Name in AWS test data: get-vanilla-query-order
-      val unsignedRequest: HttpRequest = HttpRequest(uri = Uri(s"https://www.moia.io/"), headers = Seq(RawHeader("authorization", "123")))
+      val unsignedRequest: HttpRequest =
+        HttpRequest(uri = Uri(s"https://www.moia.io/"), headers = scala.collection.immutable.Seq(RawHeader("authorization", "123")))
 
       assertThrows[AlreadyAuthorizedException] {
         underTest.signRequest(unsignedRequest).futureValue
