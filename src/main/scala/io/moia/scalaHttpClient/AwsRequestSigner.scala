@@ -26,10 +26,8 @@ import scala.jdk.CollectionConverters._
 
 class AwsRequestSigner private (credentialsProvider: AwsCredentialsProvider, region: String)(implicit mat: Materializer)
     extends StrictLogging {
-  private val awsSigner   = Aws4Signer.create()
-  private val credentials = credentialsProvider.resolveCredentials()
+  private val awsSigner = Aws4Signer.create()
   private val executionAttributes = new ExecutionAttributes()
-    .putAttribute(AwsSignerExecutionAttribute.AWS_CREDENTIALS, credentials)
     .putAttribute(AwsSignerExecutionAttribute.SERVICE_SIGNING_NAME, "execute-api")
     .putAttribute(AwsSignerExecutionAttribute.SIGNING_REGION, Region.of(region))
 
@@ -46,7 +44,11 @@ class AwsRequestSigner private (credentialsProvider: AwsCredentialsProvider, reg
     else
       Future {
         val sdkRequest = toSdkRequest(request)
+
         val signedSdkRequest = blocking {
+          // Ask the AWSCredentialsProvider for current credentials (e.g. from an existing key management system)
+          val credentials = credentialsProvider.resolveCredentials()
+          executionAttributes.putAttribute(AwsSignerExecutionAttribute.AWS_CREDENTIALS, credentials)
           awsSigner.sign(sdkRequest, executionAttributes)
         }
         // construct new HttpRequest with signed URI query params and headers
