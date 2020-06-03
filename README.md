@@ -15,7 +15,7 @@ This is a wrapper around the akka-http-client that adds
 ## Usage
 
 ```sbt
-libraryDependencies += "io.moia" %% "scala-http-client" % "2.1.0"
+libraryDependencies += "io.moia" %% "scala-http-client" % "2.1.1"
 ```
 
 ```scala
@@ -56,6 +56,7 @@ The lib outputs the following response objects (see `io.moia.scalaHttpClient.Htt
 * HTTP 400 Bad Request _without entity_ => `HttpClientError`
 * HTTP 4xx, 5xx, others => `HttpClientError`
 * if the deadline expired => `DeadlineExpired`
+* if an `AwsRequestSigner` is given, but the request already includes an "Authorization" header => `AlreadyAuthorized`
 * weird akka-errors => `ExceptionOccurred`
 
 
