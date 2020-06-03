@@ -53,7 +53,7 @@ class LoggingHttpClient[LoggingContext](
     awsRequestSigner: Option[AwsRequestSigner]
 )(implicit system: ActorSystem)
     extends HttpLayer(config, name, httpMetrics, retryConfig, clock, logger, awsRequestSigner) {
-  override protected def sendRequest(request: HttpRequest): Future[HttpResponse] = Http().singleRequest(request)
+  override protected def sendRequest: HttpRequest => Future[HttpResponse] = Http().singleRequest(_)
 }
 
 abstract class HttpLayer[LoggingContext](
@@ -67,7 +67,7 @@ abstract class HttpLayer[LoggingContext](
 )(implicit
     system: ActorSystem
 ) {
-  protected def sendRequest(request: HttpRequest): Future[HttpResponse]
+  protected def sendRequest: HttpRequest => Future[HttpResponse]
 
   def request(
       method: HttpMethod,
@@ -108,23 +108,23 @@ abstract class HttpLayer[LoggingContext](
     Future
       .successful(request)
       .andThen(logRequest)
-      .flatMap(req => sendRequest(req))
+      .flatMap(sendRequest)
       .andThen(logResponse(request))
       .andThen(logRetryAfter)
       .flatMap(strictify)
-      .flatMap(handleResponse(tryNumber, deadline, request)(_))
+      .flatMap(handleResponse(tryNumber, deadline, request))
       .recoverWith(handleErrors(tryNumber, deadline, request))
 
   private[this] def handleResponse(tryNumber: Int, deadline: Deadline, httpRequest: HttpRequest)(
       response: HttpResponse
   )(implicit ec: ExecutionContext, ctx: LoggingContext): Future[HttpClientResponse] =
     response match {
-      case HttpResponse(StatusCodes.Success(_), _, _, _)                => Future.successful(HttpClientSuccess(response))
-      case HttpResponse(StatusCodes.BadRequest, _, HttpEntity.Empty, _) => Future.successful(HttpClientError(response))
-      case HttpResponse(StatusCodes.BadRequest, _, _, _)                => Future.successful(DomainError(response))
-      case HttpResponse(StatusCodes.ClientError(_), _, _, _)            => retryWithConfig(tryNumber, httpRequest, response, deadline)
-      case HttpResponse(StatusCodes.ServerError(_), _, _, _)            => retryWithConfig(tryNumber, httpRequest, response, deadline)
-      case other                                                        => Future.successful(HttpClientError(other))
+      case response @ HttpResponse(StatusCodes.Success(_), _, _, _)                => Future.successful(HttpClientSuccess(response))
+      case response @ HttpResponse(StatusCodes.BadRequest, _, HttpEntity.Empty, _) => Future.successful(HttpClientError(response))
+      case response @ HttpResponse(StatusCodes.BadRequest, _, _, _)                => Future.successful(DomainError(response))
+      case response @ HttpResponse(StatusCodes.ClientError(_), _, _, _)            => retryWithConfig(tryNumber, httpRequest, response, deadline)
+      case response @ HttpResponse(StatusCodes.ServerError(_), _, _, _)            => retryWithConfig(tryNumber, httpRequest, response, deadline)
+      case other                                                                   => Future.successful(HttpClientError(other))
     }
 
   private[this] def strictify(response: HttpResponse)(implicit ec: ExecutionContext): Future[HttpResponse] =
