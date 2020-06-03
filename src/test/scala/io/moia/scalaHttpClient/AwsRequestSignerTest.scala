@@ -67,7 +67,7 @@ class AwsRequestSignerTest extends AnyWordSpecLike with Matchers with FutureValu
       result.headers.find(_.name() == "someHeader").map(_.value()).getOrElse("") should equal("123")
     }
 
-    "fail a GET request with an already existing Authorization header" in {
+    "fail a request with an already existing Authorization header" in {
       // Name in AWS test data: get-vanilla-query-order
       val unsignedRequest: HttpRequest =
         HttpRequest(uri = Uri(s"https://www.moia.io/"), headers = scala.collection.immutable.Seq(RawHeader("authorization", "123")))
