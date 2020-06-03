@@ -3,7 +3,7 @@ package io.moia.scalaHttpClient
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.model.{HttpRequest, Uri}
-import io.moia.scalaHttpClient.AwsRequestSigner.{AlreadyAuthorized, AwsRequestSignerConfig}
+import io.moia.scalaHttpClient.AwsRequestSigner.{AlreadyAuthorizedException, AwsRequestSignerConfig}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 
@@ -71,7 +71,7 @@ class AwsRequestSignerTest extends AnyWordSpecLike with Matchers with FutureValu
       // Name in AWS test data: get-vanilla-query-order
       val unsignedRequest: HttpRequest = HttpRequest(uri = Uri(s"https://www.moia.io/"), headers = Seq(RawHeader("authorization", "123")))
 
-      assertThrows[AlreadyAuthorized] {
+      assertThrows[AlreadyAuthorizedException] {
         underTest.signRequest(unsignedRequest).futureValue
       }
     }
