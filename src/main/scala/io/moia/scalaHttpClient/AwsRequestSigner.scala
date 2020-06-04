@@ -9,7 +9,6 @@ import akka.http.scaladsl.model.{HttpHeader, HttpRequest, Uri}
 import akka.stream.Materializer
 import akka.stream.scaladsl.StreamConverters
 import com.typesafe.scalalogging.StrictLogging
-import io.moia.scalaHttpClient.AwsRequestSigner.AlreadyAuthorizedException
 import software.amazon.awssdk.auth.credentials._
 import software.amazon.awssdk.auth.signer.{Aws4Signer, AwsSignerExecutionAttribute}
 import software.amazon.awssdk.core.interceptor.ExecutionAttributes
@@ -26,10 +25,8 @@ import scala.jdk.CollectionConverters._
 
 class AwsRequestSigner private (credentialsProvider: AwsCredentialsProvider, region: String)(implicit mat: Materializer)
     extends StrictLogging {
-  private val awsSigner   = Aws4Signer.create()
-  private val credentials = credentialsProvider.resolveCredentials()
+  private val awsSigner = Aws4Signer.create()
   private val executionAttributes = new ExecutionAttributes()
-    .putAttribute(AwsSignerExecutionAttribute.AWS_CREDENTIALS, credentials)
     .putAttribute(AwsSignerExecutionAttribute.SERVICE_SIGNING_NAME, "execute-api")
     .putAttribute(AwsSignerExecutionAttribute.SIGNING_REGION, Region.of(region))
 
@@ -46,7 +43,11 @@ class AwsRequestSigner private (credentialsProvider: AwsCredentialsProvider, reg
     else
       Future {
         val sdkRequest = toSdkRequest(request)
+
         val signedSdkRequest = blocking {
+          // Ask the AWSCredentialsProvider for current credentials (e.g. from an existing key management system)
+          val credentials = credentialsProvider.resolveCredentials()
+          executionAttributes.putAttribute(AwsSignerExecutionAttribute.AWS_CREDENTIALS, credentials)
           awsSigner.sign(sdkRequest, executionAttributes)
         }
         // construct new HttpRequest with signed URI query params and headers
@@ -122,11 +123,6 @@ object AwsRequestSigner extends StrictLogging {
     final case class Instance(awsRegion: String) extends AwsRequestSignerConfig
   }
 
-  /** Being throw when the request to be signed already includes an "Authorization" header */
-  final case class AlreadyAuthorizedException(
-      private val message: String = "The given request already includes an `Authorization` header. Won't sign again."
-  ) extends Exception(message)
-
   /**
     * Construct an `AwsRequestSigner` from the given configuration.
     *
@@ -155,3 +151,8 @@ object AwsRequestSigner extends StrictLogging {
         new AwsRequestSigner(provider, awsRegion)
     }
 }
+
+/** Being throw when the request to be signed already includes an "Authorization" header */
+final case class AlreadyAuthorizedException(
+    private val message: String = "The given request already includes an `Authorization` header. Won't sign again."
+) extends Exception(message)
