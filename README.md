@@ -15,7 +15,7 @@ This is a wrapper around the akka-http-client that adds
 ## Usage
 
 ```sbt
-libraryDependencies += "io.moia" %% "scala-http-client" % "2.1.2"
+libraryDependencies += "io.moia" %% "scala-http-client" % "3.0.0"
 ```
 
 ```scala
@@ -149,7 +149,7 @@ See [HeaderExample.scala](/src/it/scala/io/moia/scalaHttpClient/HeaderExample.sc
 
 ## Publishing
 
-[Tag](https://github.com/moia-dev/scala-http-client/tags) the new version (e.g. `v2.1.0`) and push the tags (`git push origin --tags`).
+[Tag](https://github.com/moia-dev/scala-http-client/tags) the new version (e.g. `v3.0.0`) and push the tags (`git push origin --tags`).
 
 You need a [public GPG key](https://www.scala-sbt.org/release/docs/Using-Sonatype.html) with your MOIA email and an account on https://oss.sonatype.org that can [access](https://issues.sonatype.org/browse/OSSRH-52948) the `io.moia` group.
 
