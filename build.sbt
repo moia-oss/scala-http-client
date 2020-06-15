@@ -29,7 +29,7 @@ lazy val root = (project in file("."))
     GitBranchPrompt
   )
 
-val akkaVersion     = "2.6.5"
+val akkaVersion     = "2.6.6"
 val akkaHttpVersion = "10.1.12"
 
 lazy val akkaDependencies = Seq(
