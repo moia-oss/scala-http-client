@@ -11,7 +11,7 @@ addSbtPlugin("net.vonbuchholtz" % "sbt-dependency-check" % "2.0.0")
 addSbtPlugin("com.sksamuel.scapegoat" %% "sbt-scapegoat" % "1.1.0")
 
 // Publish to sonatype
-addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.2")
+addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.3")
 
 // publishSigned
 addSbtPlugin("com.jsuereth" % "sbt-pgp" % "2.0.1")
