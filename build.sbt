@@ -29,7 +29,7 @@ lazy val root = (project in file("."))
     GitBranchPrompt
   )
 
-val akkaVersion     = "2.6.6"
+val akkaVersion     = "2.6.7"
 val akkaHttpVersion = "10.1.12"
 
 lazy val akkaDependencies = Seq(
@@ -48,7 +48,7 @@ lazy val awsDependencies = Seq(
 lazy val testDependencies = Seq(
   "org.scalatest"   %% "scalatest"       % "3.2.0"  % Test,
   "org.mockito"     %% "mockito-scala"   % "1.14.8" % Test,
-  "org.mock-server" % "mockserver-netty" % "5.10.0" % Test
+  "org.mock-server" % "mockserver-netty" % "5.11.0" % Test
 )
 
 lazy val loggingDependencies = Seq(
