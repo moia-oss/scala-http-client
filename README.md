@@ -15,7 +15,7 @@ This is a wrapper around the akka-http-client that adds
 ## Usage
 
 ```sbt
-libraryDependencies += "io.moia" %% "scala-http-client" % "3.0.0"
+libraryDependencies += "io.moia" %% "scala-http-client" % "3.1.0"
 ```
 
 ```scala
