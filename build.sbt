@@ -39,7 +39,7 @@ lazy val akkaDependencies = Seq(
   "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion % Test
 )
 
-lazy val awsJavaSdkVersion = "2.13.56"
+lazy val awsJavaSdkVersion = "2.13.76"
 lazy val awsDependencies = Seq(
   "software.amazon.awssdk" % "core" % awsJavaSdkVersion,
   "software.amazon.awssdk" % "sts"  % awsJavaSdkVersion
@@ -48,7 +48,7 @@ lazy val awsDependencies = Seq(
 lazy val testDependencies = Seq(
   "org.scalatest"   %% "scalatest"       % "3.2.1"  % Test,
   "org.mockito"     %% "mockito-scala"   % "1.14.8" % Test,
-  "org.mock-server" % "mockserver-netty" % "5.11.0" % Test
+  "org.mock-server" % "mockserver-netty" % "5.11.1" % Test
 )
 
 lazy val loggingDependencies = Seq(
