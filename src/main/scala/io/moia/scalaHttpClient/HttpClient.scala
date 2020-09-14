@@ -189,8 +189,8 @@ abstract class HttpLayer[LoggingContext](
       Future.successful(DeadlineExpired(None))
   }
 
-  private[this] def logRequest[T](implicit ctx: LoggingContext): PartialFunction[Try[HttpRequest], Unit] = {
-    case Success(request) => logger.debug(s"[$name] Sending request to ${request.method.value} ${request.uri}.")
+  private[this] def logRequest[T](implicit ctx: LoggingContext): PartialFunction[Try[HttpRequest], Unit] = { case Success(request) =>
+    logger.debug(s"[$name] Sending request to ${request.method.value} ${request.uri}.")
   }
 
   private[this] def logRetryAfter(implicit ctx: LoggingContext): PartialFunction[Try[HttpResponse], Unit] = {
