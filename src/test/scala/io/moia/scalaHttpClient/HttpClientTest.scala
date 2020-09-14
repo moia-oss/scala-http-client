@@ -76,8 +76,8 @@ class HttpClientTest extends TestSetup with Inside with StrictLogging {
       val statusCodes = List(StatusCodes.OK, StatusCodes.Accepted, StatusCodes.Created, StatusCodes.NoContent)
 
       Inspectors.forAll(statusCodes) { statusCode =>
-        inside(dummyRequestWithFixResponseStatus(statusCode)) {
-          case HttpClientSuccess(_) => succeed
+        inside(dummyRequestWithFixResponseStatus(statusCode)) { case HttpClientSuccess(_) =>
+          succeed
         }
       }
     }
@@ -110,8 +110,8 @@ class HttpClientTest extends TestSetup with Inside with StrictLogging {
 
       // Then
       result.futureValue shouldBe a[DomainError]
-      inside(result.futureValue) {
-        case DomainError(content) => Unmarshal(content.entity).to[String].futureValue shouldBe "Test"
+      inside(result.futureValue) { case DomainError(content) =>
+        Unmarshal(content.entity).to[String].futureValue shouldBe "Test"
       }
     }
 
