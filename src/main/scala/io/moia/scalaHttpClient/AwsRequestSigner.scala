@@ -108,8 +108,8 @@ class AwsRequestSigner private (credentialsProvider: AwsCredentialsProvider, reg
       .asScala
       .toSeq
       .map(h => HttpHeader.parse(h._1, h._2.asScala.head))
-      .collect {
-        case ParsingResult.Ok(header, _) => header
+      .collect { case ParsingResult.Ok(header, _) =>
+        header
       }
       .to(Seq)
 }

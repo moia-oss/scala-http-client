@@ -29,7 +29,7 @@ lazy val root = (project in file("."))
     GitBranchPrompt
   )
 
-val akkaVersion     = "2.6.8"
+val akkaVersion     = "2.6.9"
 val akkaHttpVersion = "10.2.0"
 
 lazy val akkaDependencies = Seq(
@@ -57,7 +57,7 @@ lazy val loggingDependencies = Seq(
 )
 
 lazy val scalaDependencies = Seq(
-  "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.6"
+  "org.scala-lang.modules" %% "scala-collection-compat" % "2.2.0"
 )
 
 scapegoatVersion in ThisBuild := "1.4.4"
