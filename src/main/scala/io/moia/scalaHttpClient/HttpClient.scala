@@ -191,6 +191,7 @@ abstract class HttpLayer[LoggingContext](
 
   private[this] def logRequest[T](implicit ctx: LoggingContext): PartialFunction[Try[HttpRequest], Unit] = { case Success(request) =>
     logger.debug(s"[$name] Sending request to ${request.method.value} ${request.uri}.")
+    logger.trace(s"[$name] Request headers: ${request.headers.map(h => s"[${h.name()} -> ${h.value()}]").mkString(", ")}")
   }
 
   private[this] def logRetryAfter(implicit ctx: LoggingContext): PartialFunction[Try[HttpResponse], Unit] = {
@@ -202,6 +203,7 @@ abstract class HttpLayer[LoggingContext](
     case Success(response) =>
       httpMetrics.meterResponse(request.method, request.uri.path, response)
       logger.debug(s"[$name] Received response ${response.status} from ${request.method.value} ${request.uri}.")
+      logger.trace(s"[$name] Response headers: ${response.headers.map(h => s"[${h.name()} -> ${h.value()}]").mkString(", ")}")
     case Failure(e) =>
       logger.info(s"[$name] Exception for ${request.method.value} ${request.uri}: ${e.getMessage}", e)
   }
