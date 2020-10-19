@@ -30,7 +30,7 @@ lazy val root = (project in file("."))
   )
 
 val akkaVersion     = "2.6.9"
-val akkaHttpVersion = "10.2.0"
+val akkaHttpVersion = "10.2.1"
 
 lazy val akkaDependencies = Seq(
   "com.typesafe.akka" %% "akka-stream"       % akkaVersion,
@@ -47,7 +47,7 @@ lazy val awsDependencies = Seq(
 
 lazy val testDependencies = Seq(
   "org.scalatest"   %% "scalatest"       % "3.2.2"  % Test,
-  "org.mockito"     %% "mockito-scala"   % "1.15.1" % Test,
+  "org.mockito"     %% "mockito-scala"   % "1.16.0" % Test,
   "org.mock-server" % "mockserver-netty" % "5.11.1" % Test
 )
 
