@@ -4,8 +4,7 @@ import io.moia.scalaHttpClient.AwsRequestSigner.AwsRequestSignerConfig
 
 import scala.concurrent.duration.{FiniteDuration, _}
 
-/**
-  * Configuration of a particular HTTP client.
+/** Configuration of a particular HTTP client.
   *
   * @param scheme For example "http" or "https"
   * @param host Name of the host
@@ -19,8 +18,7 @@ final case class HttpClientConfig(
     awsRequestSignerConfig: Option[AwsRequestSignerConfig] = None
 )
 
-/**
-  * Retry configuration of HTTP clients.
+/** Retry configuration of HTTP clients.
   *
   * @param retriesRequestTimeout Number of retries for HTTP 408
   * @param retriesTooManyRequests Number of retries for HTTP 429 (usually in combination with retry-after header)
