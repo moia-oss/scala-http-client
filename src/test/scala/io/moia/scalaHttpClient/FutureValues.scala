@@ -5,8 +5,7 @@ import org.scalatest.Assertions
 import scala.concurrent.duration.{Duration, DurationLong, FiniteDuration}
 import scala.concurrent.{Await, Future, TimeoutException}
 
-/**
-  * This is a helper similar to `OptionValues`.
+/** This is a helper similar to `OptionValues`.
   * It awaits a `Future` value within an accepted duration.
   * That is much nicer that `ScalaFutures` with their stupid patience config!
   *

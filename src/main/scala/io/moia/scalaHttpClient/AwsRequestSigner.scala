@@ -30,8 +30,7 @@ class AwsRequestSigner private (credentialsProvider: AwsCredentialsProvider, reg
     .putAttribute(AwsSignerExecutionAttribute.SERVICE_SIGNING_NAME, "execute-api")
     .putAttribute(AwsSignerExecutionAttribute.SIGNING_REGION, Region.of(region))
 
-  /**
-    * Signs the given HttpRequest
+  /** Signs the given HttpRequest
     *
     * @param request `HttpRequest` to be signed
     * @return `Future[HttpRequest]` the signed `HttpRequest`
@@ -54,8 +53,8 @@ class AwsRequestSigner private (credentialsProvider: AwsCredentialsProvider, reg
         HttpRequest(request.method, uri = Uri(signedSdkRequest.getUri.toString), getSdkHeaders(signedSdkRequest), request.entity)
       }(mat.executionContext)
 
-  /**
-    * Checks if the given collection of `HttpHeader`s includes one "Authorization" header
+  /** Checks if the given collection of `HttpHeader`s includes one "Authorization" header
+   *
     * @param headers `Seq[HttpHeader]` headers of an Akka `HttpRequest`
     * @return true if "Authorization" header exists
     */
@@ -64,8 +63,7 @@ class AwsRequestSigner private (credentialsProvider: AwsCredentialsProvider, reg
       header.is("authorization")
     }
 
-  /**
-    * Constructs an `SdkHttpFullRequest` from Akka's `HttpRequest` for signing.
+  /** Constructs an `SdkHttpFullRequest` from Akka's `HttpRequest` for signing.
     *
     * @param request HttpRequest to convert
     * @return SdkHttpFullRequest
@@ -96,8 +94,7 @@ class AwsRequestSigner private (credentialsProvider: AwsCredentialsProvider, reg
       .build()
   }
 
-  /**
-    * Extracts the headers from the `SdkHttpFullRequest` as collection of Akka's `HttpHeader`s
+  /** Extracts the headers from the `SdkHttpFullRequest` as collection of Akka's `HttpHeader`s
     *
     * @param signedSdkRequest `SdkHttpFullRequest` after signing
     * @return `Seq[HttpHeader]` of the signedSdkRequest
@@ -123,8 +120,7 @@ object AwsRequestSigner extends StrictLogging {
     final case class Instance(awsRegion: String) extends AwsRequestSignerConfig
   }
 
-  /**
-    * Construct an `AwsRequestSigner` from the given configuration.
+  /** Construct an `AwsRequestSigner` from the given configuration.
     *
     * @param config `AwsRequestSignerConfig` to be used to construct one of the three config providers
     * @param mat `Materializer` on which the `Future`s run
