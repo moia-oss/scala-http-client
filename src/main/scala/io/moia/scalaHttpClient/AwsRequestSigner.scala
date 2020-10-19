@@ -54,7 +54,7 @@ class AwsRequestSigner private (credentialsProvider: AwsCredentialsProvider, reg
       }(mat.executionContext)
 
   /** Checks if the given collection of `HttpHeader`s includes one "Authorization" header
-   *
+    *
     * @param headers `Seq[HttpHeader]` headers of an Akka `HttpRequest`
     * @return true if "Authorization" header exists
     */
