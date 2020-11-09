@@ -39,3 +39,4 @@ snapshots
 .java-version
 .bloop
 .scannerwork
+/.bsp/sbt.json
