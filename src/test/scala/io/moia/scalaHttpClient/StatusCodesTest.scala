@@ -46,7 +46,10 @@ class StatusCodesTest extends TestSetup with MockServer {
 
       // Then
       result.futureValue should matchPattern { case HttpClientError(_) => }
-      getClientAndServer.verify(request().withPath("/test").withMethod("POST"), VerificationTimes.exactly(3))
+      getClientAndServer.verify(
+        request().withPath("/test").withMethod("POST").withSecure(false).withKeepAlive(true),
+        VerificationTimes.exactly(3)
+      )
       succeed
     }
 
