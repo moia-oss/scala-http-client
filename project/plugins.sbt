@@ -4,9 +4,6 @@ addSbtPlugin("io.spray" % "sbt-revolver" % "0.9.1")
 // adds scalafmt
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.2")
 
-// adds dependencyCheck
-addSbtPlugin("net.vonbuchholtz" % "sbt-dependency-check" % "2.0.0")
-
 // sbt> scapegoat
 addSbtPlugin("com.sksamuel.scapegoat" %% "sbt-scapegoat" % "1.1.0")
 
