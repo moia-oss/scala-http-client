@@ -46,7 +46,7 @@ lazy val awsDependencies = Seq(
 )
 
 lazy val testDependencies = Seq(
-  "org.scalatest"   %% "scalatest"       % "3.2.2"  % Test,
+  "org.scalatest"   %% "scalatest"       % "3.2.3"  % Test,
   "org.mockito"     %% "mockito-scala"   % "1.16.0" % Test,
   "org.mock-server" % "mockserver-netty" % "5.11.2" % Test
 )
@@ -57,7 +57,7 @@ lazy val loggingDependencies = Seq(
 )
 
 lazy val scalaDependencies = Seq(
-  "org.scala-lang.modules" %% "scala-collection-compat" % "2.2.0"
+  "org.scala-lang.modules" %% "scala-collection-compat" % "2.3.0"
 )
 
 scapegoatVersion in ThisBuild := "1.4.4"
