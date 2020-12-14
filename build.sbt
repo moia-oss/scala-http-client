@@ -30,7 +30,7 @@ lazy val root = (project in file("."))
   )
 
 val akkaVersion     = "2.6.10"
-val akkaHttpVersion = "10.2.1"
+val akkaHttpVersion = "10.2.2"
 
 lazy val akkaDependencies = Seq(
   "com.typesafe.akka" %% "akka-stream"       % akkaVersion,
