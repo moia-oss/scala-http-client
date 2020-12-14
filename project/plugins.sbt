@@ -8,7 +8,7 @@ addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.2")
 addSbtPlugin("com.sksamuel.scapegoat" %% "sbt-scapegoat" % "1.1.0")
 
 // Publish to sonatype
-addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.4")
+addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.5")
 
 // publishSigned
 addSbtPlugin("com.jsuereth" % "sbt-pgp" % "2.0.2")
