@@ -11,6 +11,6 @@ addSbtPlugin("com.sksamuel.scapegoat" %% "sbt-scapegoat" % "1.1.0")
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.5")
 
 // publishSigned
-addSbtPlugin("com.jsuereth" % "sbt-pgp" % "2.0.2")
+addSbtPlugin("com.jsuereth" % "sbt-pgp" % "2.1.1")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "1.0.0")
