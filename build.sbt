@@ -46,9 +46,9 @@ lazy val awsDependencies = Seq(
 )
 
 lazy val testDependencies = Seq(
-  "org.scalatest"   %% "scalatest"       % "3.2.3"  % Test,
-  "org.mockito"     %% "mockito-scala"   % "1.16.15" % Test,
-  "org.mock-server" % "mockserver-netty" % "5.11.2" % Test
+  "org.scalatest"  %% "scalatest"        % "3.2.3"   % Test,
+  "org.mockito"    %% "mockito-scala"    % "1.16.15" % Test,
+  "org.mock-server" % "mockserver-netty" % "5.11.2"  % Test
 )
 
 lazy val loggingDependencies = Seq(
@@ -83,7 +83,7 @@ lazy val scalacOptions_2_13 = Seq(
   "-unchecked",
   "-deprecation",
   "-language:_",
-  "-target:jvm-1.8",
+  "-target:11",
   "-encoding",
   "UTF-8",
   "-Xfatal-warnings",
