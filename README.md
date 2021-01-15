@@ -15,7 +15,7 @@ This is a wrapper around the akka-http-client that adds
 ## Usage
 
 ```sbt
-libraryDependencies += "io.moia" %% "scala-http-client" % "3.1.0"
+libraryDependencies += "io.moia" %% "scala-http-client" % "4.0.0"
 ```
 
 ```scala
@@ -70,7 +70,7 @@ import com.typesafe.scalalogging._
 import org.slf4j.LoggerFactory
 
 object CustomLogging {
-  case class LoggingContext(context: String)
+  final case class LoggingContext(context: String)
 
   implicit val canLogString: CanLog[LoggingContext] = new CanLog[LoggingContext] {
     override def logMessage(originalMsg: String, ctx: LoggingContext): String = ???
