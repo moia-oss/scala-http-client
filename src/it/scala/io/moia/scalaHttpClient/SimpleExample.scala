@@ -1,25 +1,24 @@
 package io.moia.scalaHttpClient
 
-import java.time.Clock
-
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.{Unmarshal, Unmarshaller}
 import io.moia.scalaHttpClient.ExampleModel.{DomainErrorObject, GatewayException, MySuccessObject}
 
+import java.time.Clock
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
 object ExampleModel {
-  case class MySuccessObject(foo: String)
-  case class DomainErrorObject(errorMessage: String)
-  case class GatewayException(msg: String) extends RuntimeException(msg)
+  final case class MySuccessObject(foo: String)
+  final case class DomainErrorObject(errorMessage: String)
+  final case class GatewayException(msg: String) extends RuntimeException(msg)
 }
 
 object SimpleExample {
-
-  implicit val system: ActorSystem                                = ActorSystem("test")
-  implicit val executionContext: ExecutionContext                 = system.dispatcher
+  implicit val system: ActorSystem[_]                             = ActorSystem(Behaviors.empty, "test")
+  implicit val executionContext: ExecutionContext                 = system.executionContext
   implicit val um1: Unmarshaller[HttpResponse, MySuccessObject]   = ???
   implicit val um2: Unmarshaller[HttpResponse, DomainErrorObject] = ???
 
