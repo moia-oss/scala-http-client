@@ -1,18 +1,18 @@
 package io.moia.scalaHttpClient
 
-import java.time.Clock
-
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.model._
 import com.typesafe.scalalogging._
 import io.moia.scalaHttpClient.CustomLogging.LoggingContext
 import org.slf4j.LoggerFactory
 
+import java.time.Clock
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
 object CustomLogging {
-  case class LoggingContext(context: String)
+  final case class LoggingContext(context: String)
 
   implicit val canLogString: CanLog[LoggingContext] = new CanLog[LoggingContext] {
     override def logMessage(originalMsg: String, ctx: LoggingContext): String = ???
@@ -23,8 +23,8 @@ object CustomLogging {
 }
 
 object Example {
-  implicit val system: ActorSystem                = ActorSystem("test")
-  implicit val executionContext: ExecutionContext = system.dispatcher
+  implicit val system: ActorSystem[_]             = ActorSystem(Behaviors.empty, "test")
+  implicit val executionContext: ExecutionContext = system.executionContext
 
   // create the client
   val httpClient = new LoggingHttpClient[LoggingContext](

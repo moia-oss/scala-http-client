@@ -10,7 +10,6 @@ import scala.collection.immutable
 import scala.concurrent.duration._
 
 class StatusCodesTest extends TestSetup with MockServer {
-
   override implicit val defaultAwaitDuration: FiniteDuration = 1.second
 
   "respect retry configuration" when {

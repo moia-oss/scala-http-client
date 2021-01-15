@@ -34,6 +34,7 @@ val akkaHttpVersion = "10.2.2"
 
 lazy val akkaDependencies = Seq(
   "com.typesafe.akka" %% "akka-stream"       % akkaVersion,
+  "com.typesafe.akka" %% "akka-stream-typed" % akkaVersion,
   "com.typesafe.akka" %% "akka-http"         % akkaHttpVersion,
   "com.typesafe.akka" %% "akka-testkit"      % akkaVersion     % Test,
   "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion % Test
@@ -46,9 +47,9 @@ lazy val awsDependencies = Seq(
 )
 
 lazy val testDependencies = Seq(
-  "org.scalatest"   %% "scalatest"       % "3.2.3"  % Test,
-  "org.mockito"     %% "mockito-scala"   % "1.16.15" % Test,
-  "org.mock-server" % "mockserver-netty" % "5.11.2" % Test
+  "org.scalatest"  %% "scalatest"        % "3.2.3"   % Test,
+  "org.mockito"    %% "mockito-scala"    % "1.16.15" % Test,
+  "org.mock-server" % "mockserver-netty" % "5.11.2"  % Test
 )
 
 lazy val loggingDependencies = Seq(
