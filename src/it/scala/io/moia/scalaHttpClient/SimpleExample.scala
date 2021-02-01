@@ -35,7 +35,7 @@ object SimpleExample {
   // make a request
   val response: Future[HttpClientResponse] = httpClient.request(
     method   = HttpMethods.POST,
-    entity   = HttpEntity.apply("Example"),
+    entity   = HttpEntity("Example"),
     path     = "/test",
     headers  = Seq.empty,
     deadline = Deadline.now + 10.seconds

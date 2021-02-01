@@ -30,8 +30,7 @@ class HttpClientTest extends TestSetup with Inside with StrictLogging {
       }
 
       // when
-      val _ =
-        testHttpClient.request(HttpMethods.POST, HttpEntity.Empty, "/test", immutable.Seq.empty, Deadline.now + 10.seconds).futureValue
+      testHttpClient.request(HttpMethods.POST, HttpEntity.Empty, "/test", immutable.Seq.empty, Deadline.now + 10.seconds).futureValue
 
       // then
       (capturedRequest.future.futureValue.headers
@@ -63,10 +62,9 @@ class HttpClientTest extends TestSetup with Inside with StrictLogging {
       }
 
       // when
-      val _ =
-        testHttpClient
-          .request(HttpMethods.POST, HttpEntity.Empty, "/test", immutable.Seq(customerHeader), Deadline.now + 10.seconds)
-          .futureValue
+      testHttpClient
+        .request(HttpMethods.POST, HttpEntity.Empty, "/test", immutable.Seq(customerHeader), Deadline.now + 10.seconds)
+        .futureValue
 
       // then
       capturedRequest.future.futureValue.getHeader(CustomHeader.name).get.value should ===("foobar")
@@ -83,7 +81,6 @@ class HttpClientTest extends TestSetup with Inside with StrictLogging {
     }
 
     "return an HttpClientError on StatusCode 400 without an Entity" in {
-
       val testHttpClient = new HttpClient(httpClientConfig, "TestGateway", httpMetrics, retryConfig, clock, None) {
         override def sendRequest(req: HttpRequest): Future[HttpResponse] =
           Future.successful(HttpResponse().withStatus(400).withEntity(HttpEntity.Empty))
@@ -98,7 +95,6 @@ class HttpClientTest extends TestSetup with Inside with StrictLogging {
     }
 
     "return a DomainError on StatusCode 400 with an Entity" in {
-
       val testHttpClient = new HttpClient(httpClientConfig, "TestGateway", httpMetrics, retryConfig, clock, None) {
         override def sendRequest(req: HttpRequest): Future[HttpResponse] =
           Future.successful(HttpResponse().withStatus(400).withEntity(HttpEntity("Test")))
@@ -120,7 +116,7 @@ class HttpClientTest extends TestSetup with Inside with StrictLogging {
       val capturedRequest2 = Promise[HttpRequest]()
       val capturedRequest3 = Promise[HttpRequest]()
 
-      val entity = HttpEntity.apply("Example")
+      val entity = HttpEntity("Example")
 
       val testHttpClient = new HttpClient(httpClientConfig, "TestGateway", httpMetrics, retryConfig, clock, None) {
         override def sendRequest(req: HttpRequest): Future[HttpResponse] =
@@ -138,13 +134,12 @@ class HttpClientTest extends TestSetup with Inside with StrictLogging {
       }
 
       // when
-      val _ = testHttpClient.request(HttpMethods.POST, entity, "/test", immutable.Seq.empty, Deadline.now + 10.seconds).futureValue
+      testHttpClient.request(HttpMethods.POST, entity, "/test", immutable.Seq.empty, Deadline.now + 10.seconds).futureValue
 
       // then
       capturedRequest1.future.futureValue.entity should ===(entity)
       capturedRequest2.future.futureValue.entity should ===(entity)
       capturedRequest3.future.futureValue.entity should ===(entity)
-
     }
   }
 

@@ -15,7 +15,7 @@ This is a wrapper around the akka-http-client that adds
 ## Usage
 
 ```sbt
-libraryDependencies += "io.moia" %% "scala-http-client" % "4.0.0"
+libraryDependencies += "io.moia" %% "scala-http-client" % "4.2.0"
 ```
 
 ```scala
@@ -31,7 +31,7 @@ val httpClient = new HttpClient(
 // make a request
 val response: Future[HttpClientResponse] = httpClient.request(
   method   = HttpMethods.POST,
-  entity   = HttpEntity.apply("Example"),
+  entity   = HttpEntity("Example"),
   path     = "/test",
   headers  = Seq.empty,
   deadline = Deadline.now + 10.seconds
@@ -132,7 +132,7 @@ Then simply send them in the request:
 ```scala
 val response: Future[HttpClientResponse] = httpClient.request(
   method   = HttpMethods.POST,
-  entity   = HttpEntity.apply("Example"),
+  entity   = HttpEntity("Example"),
   path     = "/test",
   headers  = Seq(new CustomHeader("foobar")),
   deadline = Deadline.now + 10.seconds
