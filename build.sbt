@@ -5,8 +5,8 @@ lazy val root = (project in file("."))
     licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0")),
     scmInfo := Some(ScmInfo(url("https://github.com/moia-dev/scala-http-client"), "scm:git@github.com:moia-dev/scala-http-client.git")),
     homepage := Some(url("https://github.com/moia-dev/scala-http-client")),
-    scalaVersion := "2.13.1",
-    crossScalaVersions := List("2.13.1", "2.12.10"),
+    scalaVersion := "2.13.4",
+    crossScalaVersions := List("2.13.4", "2.12.13"),
     scalacOptions ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, 12)) => scalacOptions_2_12
@@ -61,7 +61,7 @@ lazy val scalaDependencies = Seq(
   "org.scala-lang.modules" %% "scala-collection-compat" % "2.4.1"
 )
 
-scapegoatVersion in ThisBuild := "1.4.4"
+scapegoatVersion in ThisBuild := "1.4.7"
 
 lazy val scalacOptions_2_12 = Seq(
   "-unchecked",
@@ -88,8 +88,9 @@ lazy val scalacOptions_2_13 = Seq(
   "-encoding",
   "UTF-8",
   "-Xfatal-warnings",
-  "-Ywarn-dead-code",
-  "-Ymacro-annotations"
+  "-Xlint:_,-byname-implicit",
+  "-Ymacro-annotations",
+  "-Ywarn-dead-code"
 )
 
 lazy val sonatypeSettings = {

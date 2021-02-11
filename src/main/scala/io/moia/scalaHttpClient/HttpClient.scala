@@ -27,7 +27,7 @@ class HttpClient(
       httpMetrics,
       retryConfig,
       clock,
-      Logger.takingImplicit(LoggerFactory.getLogger(getClass.getName))((msg: String, _: NoLoggingContext) => msg),
+      Logger.takingImplicit(LoggerFactory.getLogger(classOf[HttpClient].getName))((msg: String, _: NoLoggingContext) => msg),
       awsRequestSigner
     ) {
   override def request(
