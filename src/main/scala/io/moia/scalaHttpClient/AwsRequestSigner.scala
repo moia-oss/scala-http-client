@@ -19,7 +19,7 @@ import java.net.URI
 import java.util
 import scala.collection.compat._
 import scala.collection.immutable._
-import scala.concurrent.{Future, blocking}
+import scala.concurrent.{blocking, Future}
 import scala.jdk.CollectionConverters._
 
 class AwsRequestSigner private (credentialsProvider: AwsCredentialsProvider, region: String)(implicit mat: Materializer)
