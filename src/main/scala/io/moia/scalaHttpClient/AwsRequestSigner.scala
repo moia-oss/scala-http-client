@@ -1,9 +1,5 @@
 package io.moia.scalaHttpClient
 
-import java.io.InputStream
-import java.net.URI
-import java.util
-
 import akka.http.scaladsl.model.HttpHeader.ParsingResult
 import akka.http.scaladsl.model.{HttpHeader, HttpRequest, Uri}
 import akka.stream.Materializer
@@ -18,6 +14,9 @@ import software.amazon.awssdk.services.sts.StsClient
 import software.amazon.awssdk.services.sts.auth.StsAssumeRoleCredentialsProvider
 import software.amazon.awssdk.services.sts.model.AssumeRoleRequest
 
+import java.io.InputStream
+import java.net.URI
+import java.util
 import scala.collection.compat._
 import scala.collection.immutable._
 import scala.concurrent.{blocking, Future}
