@@ -88,7 +88,7 @@ lazy val scalacOptions_2_13 = Seq(
   "-encoding",
   "UTF-8",
   "-Xfatal-warnings",
-  "-Xlint:_,-byname-implicit",
+  "-Xlint:strict-unsealed-patmat",
   "-Ymacro-annotations",
   "-Ywarn-dead-code"
 )
