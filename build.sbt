@@ -7,6 +7,7 @@ lazy val root = (project in file("."))
     homepage := Some(url("https://github.com/moia-dev/scala-http-client")),
     scalaVersion := "2.13.4",
     crossScalaVersions := List("2.13.4", "2.12.13"),
+    versionScheme := Some("early-semver"),
     scalacOptions ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, 12)) => scalacOptions_2_12
