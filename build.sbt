@@ -29,6 +29,7 @@ lazy val root = (project in file("."))
     GitVersioning,
     GitBranchPrompt
   )
+  .settings(mimaSettings)
 
 val akkaVersion     = "2.6.12"
 val akkaHttpVersion = "10.2.3"
@@ -117,4 +118,8 @@ lazy val sbtGitSettings = Seq(
     case sbtVersionRegex(v, s)          => Some(s"$v-$s-SNAPSHOT")
     case _                              => None
   }
+)
+
+lazy val mimaSettings = Seq(
+  mimaPreviousArtifacts := Set("io.moia" %% "scala-http-client" % "4.0.0")
 )
