@@ -3,8 +3,8 @@ lazy val root = (project in file("."))
     name := "scala-http-client",
     organization := "io.moia",
     licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0")),
-    scmInfo := Some(ScmInfo(url("https://github.com/moia-dev/scala-http-client"), "scm:git@github.com:moia-dev/scala-http-client.git")),
-    homepage := Some(url("https://github.com/moia-dev/scala-http-client")),
+    scmInfo := Some(ScmInfo(url("https://github.com/moia-oss/scala-http-client"), "scm:git@github.com:moia-oss/scala-http-client.git")),
+    homepage := Some(url("https://github.com/moia-oss/scala-http-client")),
     scalaVersion := "2.13.4",
     crossScalaVersions := List("2.13.4", "2.12.13"),
     versionScheme := Some("early-semver"),
@@ -100,7 +100,7 @@ lazy val sonatypeSettings = {
     publishTo := sonatypePublishTo.value,
     sonatypeProfileName := organization.value,
     publishMavenStyle := true,
-    sonatypeProjectHosting := Some(GitHubHosting("moia-dev", "scala-http-client", "oss-support@moia.io")),
+    sonatypeProjectHosting := Some(GitHubHosting("moia-oss", "scala-http-client", "oss-support@moia.io")),
     credentials += Credentials(Path.userHome / ".sbt" / "sonatype_credential")
   )
 }
