@@ -9,7 +9,7 @@ This is a wrapper around the akka-http-client that adds
 * logging
 * AWS request signing
 
-![Build & Test](https://github.com/moia-dev/scala-http-client/workflows/Build%20&%20Test/badge.svg)
+![Build & Test](https://github.com/moia-oss/scala-http-client/workflows/Build%20&%20Test/badge.svg)
 [![Scala 2.13](https://img.shields.io/maven-central/v/io.moia/scala-http-client_2.13.svg)](https://search.maven.org/search?q=scala-http-client_2.13)
 
 ## Usage
@@ -149,7 +149,7 @@ See [HeaderExample.scala](/src/it/scala/io/moia/scalaHttpClient/HeaderExample.sc
 
 ## Publishing
 
-[Tag](https://github.com/moia-dev/scala-http-client/tags) the new version (e.g. `v3.0.0`) and push the tags (`git push origin --tags`).
+[Tag](https://github.com/moia-oss/scala-http-client/tags) the new version (e.g. `v3.0.0`) and push the tags (`git push origin --tags`).
 
 You need a [public GPG key](https://www.scala-sbt.org/release/docs/Using-Sonatype.html) with your MOIA email and an account on https://oss.sonatype.org that can [access](https://issues.sonatype.org/browse/OSSRH-52948) the `io.moia` group.
 
@@ -160,4 +160,4 @@ sbt:scala-http-client> +publishSigned
 
 Then head to https://oss.sonatype.org/#stagingRepositories, select the repository, `Close` and then `Release` it.
 
-Afterwards, add the release to [GitHub](https://github.com/moia-dev/scala-http-client/releases).
+Afterwards, add the release to [GitHub](https://github.com/moia-oss/scala-http-client/releases).
