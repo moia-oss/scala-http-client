@@ -49,7 +49,7 @@ lazy val awsDependencies = Seq(
 )
 
 lazy val testDependencies = Seq(
-  "org.scalatest"  %% "scalatest"        % "3.2.3"   % Test,
+  "org.scalatest"  %% "scalatest"        % "3.2.5"   % Test,
   "org.mockito"    %% "mockito-scala"    % "1.16.25" % Test,
   "org.mock-server" % "mockserver-netty" % "5.11.2"  % Test
 )
