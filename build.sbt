@@ -31,7 +31,7 @@ lazy val root = (project in file("."))
   )
   .settings(mimaSettings)
 
-val akkaVersion     = "2.6.12"
+val akkaVersion     = "2.6.13"
 val akkaHttpVersion = "10.2.4"
 
 lazy val akkaDependencies = Seq(
