@@ -32,7 +32,7 @@ lazy val root = (project in file("."))
   .settings(mimaSettings)
 
 val akkaVersion     = "2.6.13"
-val akkaHttpVersion = "10.2.3"
+val akkaHttpVersion = "10.2.4"
 
 lazy val akkaDependencies = Seq(
   "com.typesafe.akka" %% "akka-stream"       % akkaVersion,
@@ -63,7 +63,7 @@ lazy val scalaDependencies = Seq(
   "org.scala-lang.modules" %% "scala-collection-compat" % "2.4.2"
 )
 
-scapegoatVersion in ThisBuild := "1.4.7"
+scapegoatVersion in ThisBuild := "1.4.8"
 
 lazy val scalacOptions_2_12 = Seq(
   "-unchecked",
