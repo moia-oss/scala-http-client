@@ -31,8 +31,8 @@ lazy val root = (project in file("."))
   )
   .settings(mimaSettings)
 
-val akkaVersion     = "2.6.12"
-val akkaHttpVersion = "10.2.3"
+val akkaVersion     = "2.6.13"
+val akkaHttpVersion = "10.2.4"
 
 lazy val akkaDependencies = Seq(
   "com.typesafe.akka" %% "akka-stream"       % akkaVersion,
@@ -50,7 +50,7 @@ lazy val awsDependencies = Seq(
 
 lazy val testDependencies = Seq(
   "org.scalatest"  %% "scalatest"        % "3.2.5"   % Test,
-  "org.mockito"    %% "mockito-scala"    % "1.16.25" % Test,
+  "org.mockito"    %% "mockito-scala"    % "1.16.29" % Test,
   "org.mock-server" % "mockserver-netty" % "5.11.2"  % Test
 )
 
@@ -63,7 +63,7 @@ lazy val scalaDependencies = Seq(
   "org.scala-lang.modules" %% "scala-collection-compat" % "2.4.2"
 )
 
-scapegoatVersion in ThisBuild := "1.4.7"
+scapegoatVersion in ThisBuild := "1.4.8"
 
 lazy val scalacOptions_2_12 = Seq(
   "-unchecked",
