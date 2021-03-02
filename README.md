@@ -158,6 +158,9 @@ Add your credentials to `~/.sbt/sonatype_credential` and run
 sbt:scala-http-client> +publishSigned
 ```
 
-Then head to https://oss.sonatype.org/#stagingRepositories, select the repository, `Close` and then `Release` it.
+Then close and release the [repository](https://oss.sonatype.org/#stagingRepositories).
+```
+sbt:scala-http-client> +sonatypeRelease
+```
 
 Afterwards, add the release to [GitHub](https://github.com/moia-oss/scala-http-client/releases).
