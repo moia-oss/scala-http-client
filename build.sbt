@@ -22,7 +22,7 @@ lazy val root = (project in file("."))
   .settings(
     scalafmtOnCompile := true,
     Defaults.itSettings,
-    scalacOptions in IntegrationTest := (scalacOptions in Compile).value.filterNot(_ == "-Ywarn-dead-code")
+    IntegrationTest / scalacOptions := (Compile / scalacOptions).value.filterNot(_ == "-Ywarn-dead-code")
   )
   .settings(sbtGitSettings)
   .enablePlugins(
@@ -63,7 +63,7 @@ lazy val scalaDependencies = Seq(
   "org.scala-lang.modules" %% "scala-collection-compat" % "2.4.4"
 )
 
-scapegoatVersion in ThisBuild := "1.4.8"
+ThisBuild / scapegoatVersion := "1.4.8"
 
 lazy val scalacOptions_2_12 = Seq(
   "-unchecked",
