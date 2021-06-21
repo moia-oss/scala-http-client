@@ -22,7 +22,7 @@ lazy val root = (project in file("."))
   .settings(
     scalafmtOnCompile := true,
     Defaults.itSettings,
-    scalacOptions in IntegrationTest := (scalacOptions in Compile).value.filterNot(_ == "-Ywarn-dead-code")
+    IntegrationTest / scalacOptions := (Compile / scalacOptions).value.filterNot(_ == "-Ywarn-dead-code")
   )
   .settings(sbtGitSettings)
   .enablePlugins(
@@ -31,7 +31,7 @@ lazy val root = (project in file("."))
   )
   .settings(mimaSettings)
 
-val akkaVersion     = "2.6.14"
+val akkaVersion     = "2.6.15"
 val akkaHttpVersion = "10.2.4"
 
 lazy val akkaDependencies = Seq(
@@ -42,7 +42,7 @@ lazy val akkaDependencies = Seq(
   "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion % Test
 )
 
-lazy val awsJavaSdkVersion = "2.15.82"
+lazy val awsJavaSdkVersion = "2.16.87"
 lazy val awsDependencies = Seq(
   "software.amazon.awssdk" % "core" % awsJavaSdkVersion,
   "software.amazon.awssdk" % "sts"  % awsJavaSdkVersion
@@ -55,7 +55,7 @@ lazy val testDependencies = Seq(
 )
 
 lazy val loggingDependencies = Seq(
-  "com.typesafe.scala-logging" %% "scala-logging"   % "3.9.3",
+  "com.typesafe.scala-logging" %% "scala-logging"   % "3.9.4",
   "ch.qos.logback"              % "logback-classic" % "1.2.3" % Test
 )
 
@@ -63,7 +63,7 @@ lazy val scalaDependencies = Seq(
   "org.scala-lang.modules" %% "scala-collection-compat" % "2.4.4"
 )
 
-scapegoatVersion in ThisBuild := "1.4.8"
+ThisBuild / scapegoatVersion := "1.4.9"
 
 lazy val scalacOptions_2_12 = Seq(
   "-unchecked",
