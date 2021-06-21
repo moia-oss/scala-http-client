@@ -55,7 +55,7 @@ lazy val testDependencies = Seq(
 )
 
 lazy val loggingDependencies = Seq(
-  "com.typesafe.scala-logging" %% "scala-logging"   % "3.9.3",
+  "com.typesafe.scala-logging" %% "scala-logging"   % "3.9.4",
   "ch.qos.logback"              % "logback-classic" % "1.2.3" % Test
 )
 
@@ -63,7 +63,7 @@ lazy val scalaDependencies = Seq(
   "org.scala-lang.modules" %% "scala-collection-compat" % "2.4.4"
 )
 
-ThisBuild / scapegoatVersion := "1.4.8"
+ThisBuild / scapegoatVersion := "1.4.9"
 
 lazy val scalacOptions_2_12 = Seq(
   "-unchecked",
