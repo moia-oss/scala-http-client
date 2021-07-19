@@ -42,7 +42,7 @@ lazy val akkaDependencies = Seq(
   "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion % Test
 )
 
-lazy val awsJavaSdkVersion = "2.16.87"
+lazy val awsJavaSdkVersion = "2.16.104"
 lazy val awsDependencies = Seq(
   "software.amazon.awssdk" % "core" % awsJavaSdkVersion,
   "software.amazon.awssdk" % "sts"  % awsJavaSdkVersion
