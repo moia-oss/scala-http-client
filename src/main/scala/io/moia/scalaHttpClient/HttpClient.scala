@@ -200,10 +200,15 @@ abstract class HttpLayer[LoggingContext](
 }
 
 sealed abstract class HttpClientResponse
+
 final case class HttpClientSuccess(content: HttpResponse) extends HttpClientResponse
+
 final case class DomainError(content: HttpResponse) extends HttpClientResponse
 
 sealed abstract class HttpClientFailure extends HttpClientResponse
+
 final case class HttpClientError(content: HttpResponse) extends HttpClientFailure
+
 final case class DeadlineExpired(content: Option[HttpResponse] = None) extends HttpClientFailure
+
 final case class ExceptionOccurred(exception: Exception) extends HttpClientFailure

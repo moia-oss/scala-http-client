@@ -22,8 +22,7 @@ import scala.collection.immutable._
 import scala.concurrent.{blocking, Future}
 import scala.jdk.CollectionConverters._
 
-class AwsRequestSigner private (credentialsProvider: AwsCredentialsProvider, region: String)(implicit mat: Materializer)
-    extends StrictLogging {
+class AwsRequestSigner private (credentialsProvider: AwsCredentialsProvider, region: String)(implicit mat: Materializer) extends StrictLogging {
   private val awsSigner = Aws4Signer.create()
   private val executionAttributes = new ExecutionAttributes()
     .putAttribute(AwsSignerExecutionAttribute.SERVICE_SIGNING_NAME, "execute-api")
@@ -57,10 +56,7 @@ class AwsRequestSigner private (credentialsProvider: AwsCredentialsProvider, reg
     * @param headers `Seq[HttpHeader]` headers of an Akka `HttpRequest`
     * @return true if "Authorization" header exists
     */
-  private def isAlreadyAuthorized(headers: Seq[HttpHeader]): Boolean =
-    headers.exists { header: HttpHeader =>
-      header.is("authorization")
-    }
+  private def isAlreadyAuthorized(headers: Seq[HttpHeader]): Boolean = headers.exists(_.is("authorization"))
 
   /** Constructs an `SdkHttpFullRequest` from Akka's `HttpRequest` for signing.
     *
@@ -68,9 +64,7 @@ class AwsRequestSigner private (credentialsProvider: AwsCredentialsProvider, reg
     * @return SdkHttpFullRequest
     */
   private def toSdkRequest(request: HttpRequest): SdkHttpFullRequest = {
-    val content: InputStream = request.entity.dataBytes.runWith(
-      StreamConverters.asInputStream()
-    )
+    val content: InputStream = request.entity.dataBytes.runWith(StreamConverters.asInputStream())
     val headers: util.Map[String, util.List[String]] =
       request.headers.groupBy(_.name).view.mapValues(_.map(_.value)).map(h => h._1 -> h._2.toList.asJava).toMap.asJava
     val query: util.Map[String, util.List[String]] =
@@ -115,14 +109,16 @@ object AwsRequestSigner extends StrictLogging {
 
   object AwsRequestSignerConfig {
     final case class AssumeRole(roleArn: String, roleSessionName: String, awsRegion: String) extends AwsRequestSignerConfig
+
     final case class BasicCredentials(accessKey: String, secretKey: String, awsRegion: String) extends AwsRequestSignerConfig
+
     final case class Instance(awsRegion: String) extends AwsRequestSignerConfig
   }
 
   /** Construct an `AwsRequestSigner` from the given configuration.
     *
     * @param config `AwsRequestSignerConfig` to be used to construct one of the three config providers
-    * @param mat `Materializer` on which the `Future`s run
+    * @param mat    `Materializer` on which the `Future`s run
     * @return `AwsRequestSigner`
     */
   def fromConfig(config: AwsRequestSignerConfig)(implicit mat: Materializer): AwsRequestSigner =
@@ -135,9 +131,7 @@ object AwsRequestSigner extends StrictLogging {
         val provider: StsAssumeRoleCredentialsProvider = StsAssumeRoleCredentialsProvider
           .builder()
           .stsClient(StsClient.create())
-          .refreshRequest(
-            AssumeRoleRequest.builder().roleArn(roleArn).roleSessionName(roleSessionName).build()
-          )
+          .refreshRequest(AssumeRoleRequest.builder().roleArn(roleArn).roleSessionName(roleSessionName).build())
           .build()
         new AwsRequestSigner(provider, awsRegion)
       case AwsRequestSignerConfig.BasicCredentials(accessKey, secretKey, awsRegion) =>
