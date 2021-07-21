@@ -141,6 +141,23 @@ class HttpClientTest extends TestSetup with Inside with StrictLogging {
       capturedRequest2.future.futureValue.entity should ===(entity)
       capturedRequest3.future.futureValue.entity should ===(entity)
     }
+
+    "interrupt the request when the Deadline is overdue" in {
+      val entity = HttpEntity("Example")
+
+      val testHttpClient = new HttpClient(httpClientConfig, "TestGateway", httpMetrics, retryConfig, clock, None) {
+        override def sendRequest(req: HttpRequest): Future[HttpResponse] = {
+          Thread.sleep(2000)
+          Future.successful(HttpResponse())
+        }
+      }
+
+      // when
+      val res = testHttpClient.request(HttpMethods.POST, entity, "/test", Seq.empty, Deadline.now + 1.second).futureValue(2.seconds)
+
+      // then
+      res should matchPattern { case DeadlineExpired(None) => }
+    }
   }
 
   private[this] def dummyRequestWithFixResponseStatus(status: StatusCode): HttpClientResponse =

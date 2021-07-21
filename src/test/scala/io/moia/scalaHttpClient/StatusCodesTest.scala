@@ -105,7 +105,7 @@ class StatusCodesTest extends TestSetup with MockServer {
   }
 
   "not retry" when {
-    "deadline would be exceeded" in {
+    "the Deadline exceeded" in {
       val httpClient = new HttpClient(mockServerHttpClientConfig, "TestClient", httpMetrics, retryConfig, clock, None)
 
       getClientAndServer
@@ -113,6 +113,7 @@ class StatusCodesTest extends TestSetup with MockServer {
         .respond(response().withStatusCode(StatusCodes.TooManyRequests.intValue))
 
       val veryShortDeadline = Deadline.now + 1.milli
+
       // When
       val result = httpClient.request(HttpMethods.POST, HttpEntity.Empty, "/test", immutable.Seq.empty, veryShortDeadline)
 

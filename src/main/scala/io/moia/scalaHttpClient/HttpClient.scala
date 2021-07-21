@@ -75,8 +75,11 @@ abstract class HttpLayer[LoggingContext](
   )(implicit executionContext: ExecutionContext, ctx: LoggingContext): Future[HttpClientResponse] =
     if (deadline.isOverdue())
       Future.successful(DeadlineExpired())
-    else
-      buildRequest(method, entity, path, headers, queryString).flatMap(executeRequest(_, 1, deadline))
+    else {
+      val request: Future[HttpClientResponse] = buildRequest(method, entity, path, headers, queryString).flatMap(executeRequest(_, 1, deadline))
+      val timeout: Future[DeadlineExpired]    = Future { Thread.sleep(deadline.timeLeft.toMillis); DeadlineExpired(None) }
+      Future.firstCompletedOf(Seq(request, timeout))
+    }
 
   private[this] def buildRequest(
       method: HttpMethod,
